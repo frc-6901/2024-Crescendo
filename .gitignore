@@ -1,3 +1,9 @@
+.gradle/
+.vscode/
+.wpilib/
+build/
+gradle/
+
 # Compiled class file
 *.class
 
