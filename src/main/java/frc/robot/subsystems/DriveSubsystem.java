@@ -89,6 +89,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Gyro Yaw", ypr[0]);
     SmartDashboard.putNumber("Gyro Pitch", ypr[1]);
     SmartDashboard.putNumber("Gyro Roll", ypr[2]);
+    SmartDashboard.putNumber("Gyro Turn Rate", getTurnRate());
   }
 
   /**
@@ -240,7 +241,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.resetEncoders();
     m_rearRight.resetEncoders();
   }
-
 
   /**
    * Returns the heading of the robot.
