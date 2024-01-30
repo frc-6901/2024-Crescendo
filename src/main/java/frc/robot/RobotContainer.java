@@ -8,7 +8,6 @@ import frc.robot.Constants.ControllerConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -36,8 +35,8 @@ public class RobotContainer {
                 () -> m_robotDrive.drive(
                     -MathUtil.applyDeadband(m_navigatorController.getLeftY(), ControllerConstants.kDriveDeadband),
                     -MathUtil.applyDeadband(m_navigatorController.getLeftX(), ControllerConstants.kDriveDeadband),
-                    -MathUtil.applyDeadband(m_navigatorController.getRightX() * 0.4, ControllerConstants.kDriveDeadband),
-                    true, true),
+                    -MathUtil.applyDeadband(m_navigatorController.getRightX(), ControllerConstants.kDriveDeadband),
+                    true),
                 m_robotDrive));
 
     configureBindings();
@@ -53,7 +52,6 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-        m_navigatorController.y().onTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive));
   }
 
   /**

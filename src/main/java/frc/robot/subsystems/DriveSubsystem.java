@@ -13,11 +13,12 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
-import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix.sensors.PigeonIMU;
+
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -42,7 +43,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+  private final PigeonIMU m_gyro = new PigeonIMU(DriveConstants.kPigeonIMUId);
 
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
@@ -56,7 +57,7 @@ public class DriveSubsystem extends SubsystemBase {
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
+      Rotation2d.fromDegrees(0),
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
@@ -70,15 +71,24 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    double[] ypr = new double[3];
+    m_gyro.getYawPitchRoll(ypr);
+    double gyroAngle = Math.toRadians(ypr[0]);
+    
     // Update the odometry in the periodic block
     m_odometry.update(
-        Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
+        Rotation2d.fromDegrees(gyroAngle),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+
+    // Put the gyro angles on the SmartDashboard
+    SmartDashboard.putNumber("Gyro Yaw", ypr[0]);
+    SmartDashboard.putNumber("Gyro Pitch", ypr[1]);
+    SmartDashboard.putNumber("Gyro Roll", ypr[2]);
   }
 
   /**
@@ -92,12 +102,18 @@ public class DriveSubsystem extends SubsystemBase {
 
   /**
    * Resets the odometry to the specified pose.
-   *
+   *e
+   
+   
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
+    double[] ypr = new double[3];
+    m_gyro.getYawPitchRoll(ypr);
+    double gyroAngle = Math.toRadians(ypr[0]);
+
     m_odometry.resetPosition(
-        Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
+        Rotation2d.fromDegrees(gyroAngle),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -117,7 +133,7 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    * @param rateLimit     Whether to enable rate limiting for smoother control.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
+  public void drive(double xSpeed, double ySpeed, double rot, boolean rateLimit) {
     
     double xSpeedCommanded;
     double ySpeedCommanded;
@@ -134,7 +150,6 @@ public class DriveSubsystem extends SubsystemBase {
       } else {
         directionSlewRate = 500.0; //some high number that means the slew rate is effectively instantaneous
       }
-      
 
       double currentTime = WPIUtilJNI.now() * 1e-6;
       double elapsedTime = currentTime - m_prevTime;
@@ -175,12 +190,19 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
 
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-        fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)))
-            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+    // Gyro offset for field-relative control
+    double[] ypr = new double[3];
+    m_gyro.getYawPitchRoll(ypr);
+    double gyroAngle = Math.toRadians(ypr[0]);
+
+    double temp = ySpeedCommanded * Math.cos(gyroAngle) + xSpeedCommanded * Math.sin(gyroAngle);
+    xSpeedCommanded = -ySpeedCommanded * Math.sin(gyroAngle) + xSpeedCommanded * Math.cos(gyroAngle);
+    ySpeedCommanded = temp;
+
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(ypr[0])));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -219,10 +241,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.resetEncoders();
   }
 
-  /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    m_gyro.reset();
-  }
 
   /**
    * Returns the heading of the robot.
@@ -230,7 +248,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)).getDegrees();
+    double[] ypr = new double[3];
+    m_gyro.getYawPitchRoll(ypr);
+    double gyroAngle = Math.toRadians(ypr[0]);
+    return Rotation2d.fromDegrees(gyroAngle).getDegrees();
   }
 
   /**
@@ -239,6 +260,9 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate(IMUAxis.kZ) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    double[] ypr = new double[3];
+    m_gyro.getYawPitchRoll(ypr);
+    double gyroAngle = Math.toRadians(ypr[0]);
+    return gyroAngle * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 }
