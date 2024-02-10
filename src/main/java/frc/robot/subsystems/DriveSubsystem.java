@@ -242,7 +242,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.resetEncoders();
   }
 
-
   /**
    * Returns the heading of the robot.
    *
