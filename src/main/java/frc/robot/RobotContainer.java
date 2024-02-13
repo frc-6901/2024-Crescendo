@@ -5,7 +5,9 @@
 package frc.robot;
 
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.commands.VisionAimTarget;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -25,6 +27,8 @@ public class RobotContainer {
 
   private final CommandXboxController m_navigatorController =
       new CommandXboxController(ControllerConstants.kNavigatorPort);
+
+  private final VisionSubsystem m_vision = new VisionSubsystem();
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -52,6 +56,8 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    // Configure your button bindings here
+    m_navigatorController.a().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
   }
 
   /**
