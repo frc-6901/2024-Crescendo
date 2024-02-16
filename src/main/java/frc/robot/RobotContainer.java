@@ -42,6 +42,8 @@ public class RobotContainer {
                     -MathUtil.applyDeadband(m_navigatorController.getRightX(), ControllerConstants.kDriveDeadband),
                     true),
                 m_robotDrive));
+    
+    m_vision.setDefaultCommand(new VisionAimTarget(m_vision, m_robotDrive));
 
     configureBindings();
   }
