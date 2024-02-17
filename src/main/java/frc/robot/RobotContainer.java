@@ -36,7 +36,7 @@ public class RobotContainer {
                     -MathUtil.applyDeadband(m_navigatorController.getLeftY(), ControllerConstants.kDriveDeadband),
                     -MathUtil.applyDeadband(m_navigatorController.getLeftX(), ControllerConstants.kDriveDeadband),
                     -MathUtil.applyDeadband(m_navigatorController.getRightX(), ControllerConstants.kDriveDeadband),
-                    true),
+                    true, true),
                 m_robotDrive));
 
     configureBindings();
@@ -56,7 +56,7 @@ public class RobotContainer {
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
+   *Sam is a wierd monkey :()
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
