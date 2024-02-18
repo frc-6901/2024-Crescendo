@@ -40,10 +40,9 @@ public class RobotContainer {
                     -MathUtil.applyDeadband(m_navigatorController.getLeftY(), ControllerConstants.kDriveDeadband),
                     -MathUtil.applyDeadband(m_navigatorController.getLeftX(), ControllerConstants.kDriveDeadband),
                     -MathUtil.applyDeadband(m_navigatorController.getRightX(), ControllerConstants.kDriveDeadband),
-                    true),
+                    true, true),
                 m_robotDrive));
     
-    m_vision.setDefaultCommand(new VisionAimTarget(m_vision, m_robotDrive));
 
     configureBindings();
   }
@@ -60,6 +59,7 @@ public class RobotContainer {
   private void configureBindings() {
     // Configure your button bindings here
     m_navigatorController.a().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
+    m_navigatorController.y().onTrue(m_robotDrive.zeroHeading());
   }
 
   /**

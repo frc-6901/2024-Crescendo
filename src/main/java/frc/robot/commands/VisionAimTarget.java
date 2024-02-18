@@ -27,7 +27,7 @@ public class VisionAimTarget extends PIDCommand {
         // This uses the output
         output -> {
           // Use the output here
-          driveSubsystem.drive(0, 0, output, false);
+          driveSubsystem.drive(0, 0, output, false, false);
         });
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(camera, driveSubsystem);

@@ -38,7 +38,7 @@ public final class Constants {
   }
 
   public static final class VisionConstans {
-    public static final String kCameraName = "YOUR CAMERA NAME";
+    public static final String kCameraName = "Arducam_OV9281_USB_Camera";
         // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
         public static final Transform3d kRobotToCam =
                 new Transform3d(new Translation3d(0.5, 0.0, 0), new Rotation3d(0, 0, 0));
@@ -67,9 +67,9 @@ public final class Constants {
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(24.5);
+    public static final double kTrackWidth = Units.inchesToMeters(26);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(24.5);
+    public static final double kWheelBase = Units.inchesToMeters(26);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -84,14 +84,14 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontRightTurningCanId = 1;
-    public static final int kFrontRightDrivingCanId = 2;
-    public static final int kFrontLeftTurningCanId = 3;
-    public static final int kFrontLeftDrivingCanId = 4;
-    public static final int kRearLeftTurningCanId = 5;
-    public static final int kRearLeftDrivingCanId = 6;
-    public static final int kRearRightTurningCanId = 7;
-    public static final int kRearRightDrivingCanId = 8;
+    public static final int kFrontRightDrivingCanId = 1;
+    public static final int kFrontRightTurningCanId = 2;
+    public static final int kFrontLeftDrivingCanId = 3;
+    public static final int kFrontLeftTurningCanId = 4;
+    public static final int kRearLeftDrivingCanId = 5;
+    public static final int kRearLeftTurningCanId = 6;
+    public static final int kRearRightDrivingCanId = 7;
+    public static final int kRearRightTurningCanId = 8;
 
     // Pigeon Gyro
     public static final int kPigeonIMUId = 20;

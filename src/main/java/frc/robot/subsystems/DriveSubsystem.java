@@ -16,6 +16,8 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
@@ -134,7 +136,7 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    * @param rateLimit     Whether to enable rate limiting for smoother control.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean rateLimit) {
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
     
     double xSpeedCommanded;
     double ySpeedCommanded;
@@ -191,23 +193,36 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
 
-    // Gyro offset for field-relative control
-    double[] ypr = new double[3];
-    m_gyro.getYawPitchRoll(ypr);
-    double gyroAngle = Math.toRadians(ypr[0]);
+    if (fieldRelative) {
+      // Gyro offset for field-relative control
+      double[] ypr = new double[3];
+      m_gyro.getYawPitchRoll(ypr);
+      double gyroAngle = Math.toRadians(ypr[0]);
 
-    double temp = ySpeedCommanded * Math.cos(gyroAngle) + xSpeedCommanded * Math.sin(gyroAngle);
-    xSpeedCommanded = -ySpeedCommanded * Math.sin(gyroAngle) + xSpeedCommanded * Math.cos(gyroAngle);
-    ySpeedCommanded = temp;
+      double temp = ySpeedCommanded * Math.cos(gyroAngle) + xSpeedCommanded * Math.sin(gyroAngle);
+      xSpeedCommanded = -ySpeedCommanded * Math.sin(gyroAngle) + xSpeedCommanded * Math.cos(gyroAngle);
+      ySpeedCommanded = temp;
 
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(ypr[0])));
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+      var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(ypr[0])));
+      SwerveDriveKinematics.desaturateWheelSpeeds(
+          swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+      
+      m_frontLeft.setDesiredState(swerveModuleStates[0]);
+      m_frontRight.setDesiredState(swerveModuleStates[1]);
+      m_rearLeft.setDesiredState(swerveModuleStates[2]);
+      m_rearRight.setDesiredState(swerveModuleStates[3]);
+    }
+
+    else {
+      var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+      SwerveDriveKinematics.desaturateWheelSpeeds(
+          swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+      
+      m_frontLeft.setDesiredState(swerveModuleStates[0]);
+      m_frontRight.setDesiredState(swerveModuleStates[1]);
+      m_rearLeft.setDesiredState(swerveModuleStates[2]);
+      m_rearRight.setDesiredState(swerveModuleStates[3]);
+    }
   }
 
   /**
@@ -240,6 +255,14 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.resetEncoders();
     m_frontRight.resetEncoders();
     m_rearRight.resetEncoders();
+  }
+
+  /** Zeroes the heading of the robot. */
+  public Command zeroHeading() {
+    return runOnce(
+      () -> {
+        m_gyro.setYaw(0);
+      });
   }
 
   /**
