@@ -191,28 +191,36 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
 
-    // Gyro offset for field-relative control
-    double[] ypr = new double[3];
-    m_gyro.getYawPitchRoll(ypr);
-    double gyroAngle = Math.toRadians(ypr[0]);
+    if (fieldRelative) {
+      // Gyro offset for field-relative control
+      double[] ypr = new double[3];
+      m_gyro.getYawPitchRoll(ypr);
+      double gyroAngle = Math.toRadians(ypr[0]);
 
-    double temp = ySpeedCommanded * Math.cos(gyroAngle) + xSpeedCommanded * Math.sin(gyroAngle);
-    xSpeedCommanded = -ySpeedCommanded * Math.sin(gyroAngle) + xSpeedCommanded * Math.cos(gyroAngle);
-    ySpeedCommanded = temp;
+      double temp = ySpeedCommanded * Math.cos(gyroAngle) + xSpeedCommanded * Math.sin(gyroAngle);
+      xSpeedCommanded = -ySpeedCommanded * Math.sin(gyroAngle) + xSpeedCommanded * Math.cos(gyroAngle);
+      ySpeedCommanded = temp;
 
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(ypr[0])));
-    // var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-    //     fieldRelative
-    //         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(ypr[0]))
-    //         : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
-    
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+      var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(ypr[0])));
+      SwerveDriveKinematics.desaturateWheelSpeeds(
+          swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+      
+      m_frontLeft.setDesiredState(swerveModuleStates[0]);
+      m_frontRight.setDesiredState(swerveModuleStates[1]);
+      m_rearLeft.setDesiredState(swerveModuleStates[2]);
+      m_rearRight.setDesiredState(swerveModuleStates[3]);
+    }
+
+    else {
+      var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+      SwerveDriveKinematics.desaturateWheelSpeeds(
+          swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+      
+      m_frontLeft.setDesiredState(swerveModuleStates[0]);
+      m_frontRight.setDesiredState(swerveModuleStates[1]);
+      m_rearLeft.setDesiredState(swerveModuleStates[2]);
+      m_rearRight.setDesiredState(swerveModuleStates[3]);
+    }
   }
 
   /**
