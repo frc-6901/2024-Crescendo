@@ -66,6 +66,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     m_navigatorController.x().onTrue(Commands.runOnce(() -> m_climb.setClimb(ClimberConstants.ClimberPower), m_climb));
+    m_navigatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));
   }
 
   /**

@@ -16,25 +16,29 @@ import frc.robot.Constants.ClimberConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
   private CANSparkMax m_climber = new CANSparkMax(ClimberConstants.ClimberCanID, MotorType.kBrushless);
-  private SparkLimitSwitch m_reverseLimit = m_climber.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+  //private SparkLimitSwitch m_reverseLimit = m_climber.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
 
   /** Creates a new ClimberSubsystem. */
   public ClimberSubsystem() {
     m_climber.restoreFactoryDefaults();
     m_climber.setIdleMode(IdleMode.kBrake);
 
-    m_reverseLimit.enableLimitSwitch(false);
-    SmartDashboard.putBoolean("Reverse Limit Enabled", m_reverseLimit.isLimitSwitchEnabled());
+    //m_reverseLimit.enableLimitSwitch(false);
+    //SmartDashboard.putBoolean("Reverse Limit Enabled", m_reverseLimit.isLimitSwitchEnabled());
   }
 
   public void setClimb(double power) {
     m_climber.setVoltage(power);
   }
 
+  public void reverseClimb() {
+    ClimberConstants.ClimberPower *= -1;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    m_reverseLimit.enableLimitSwitch(SmartDashboard.getBoolean("Reverse Limit Enabled", false));
-    SmartDashboard.putBoolean("Reverse Limit Switch", m_reverseLimit.isPressed());
+    //m_reverseLimit.enableLimitSwitch(SmartDashboard.getBoolean("Reverse Limit Enabled", false));
+    //SmartDashboard.putBoolean("Reverse Limit Switch", m_reverseLimit.isPressed());
   }
 }
