@@ -4,10 +4,15 @@
 
 package frc.robot;
 
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.commands.VisionAimTarget;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -26,6 +31,10 @@ public class RobotContainer {
   private final CommandXboxController m_navigatorController =
       new CommandXboxController(ControllerConstants.kNavigatorPort);
 
+  private final VisionSubsystem m_vision = new VisionSubsystem();
+
+  private final ClimberSubsystem m_climb = new ClimberSubsystem();
+
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -38,6 +47,14 @@ public class RobotContainer {
                     -MathUtil.applyDeadband(m_navigatorController.getRightX(), ControllerConstants.kDriveDeadband),
                     true, true),
                 m_robotDrive));
+    
+    m_climb.setDefaultCommand(
+      new RunCommand(
+        () -> {
+          m_climb.setClimb(0.0);
+        },
+        m_climb)
+    );
 
     configureBindings();
   }
@@ -52,6 +69,10 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    // Configure your button bindings here
+    m_navigatorController.a().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
+
+    m_navigatorController.x().onTrue(Commands.runOnce(() -> m_climb.setClimb(ClimberConstants.ClimberPower), m_climb));
   }
 
   /**
