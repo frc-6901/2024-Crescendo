@@ -15,13 +15,10 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import frc.robot.Robot;
 import frc.robot.Constants.VisionConstans;
 
 public class VisionSubsystem extends SubsystemBase {
@@ -87,5 +84,12 @@ public class VisionSubsystem extends SubsystemBase {
     else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
 
     return estStdDevs;
+  }
+
+  @Override
+  public void periodic() {
+    // Put the gyro angles on the SmartDashboard
+    for (var target: getLatestResult().getTargets())
+      SmartDashboard.putNumber("target", target.getFiducialId());
   }
 }
