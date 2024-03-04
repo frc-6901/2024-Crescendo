@@ -40,8 +40,8 @@ public final class Constants {
   }
 
   public static final class ClimberConstants {
-    public static final int ClimberCanID = 15;
-    public static final double ClimberPower = 3.0;
+    public static final int ClimberCanID = 20;
+    public static double ClimberPower = 3.0;
   }
 
   public static final class IntakeConstants {
