@@ -31,7 +31,7 @@ public class RobotContainer {
   private final CommandXboxController m_navigatorController =
       new CommandXboxController(ControllerConstants.kNavigatorPort);
 
-  private final VisionSubsystem m_vision = new VisionSubsystem();
+  //private final VisionSubsystem m_vision = new VisionSubsystem();
 
   private final ClimberSubsystem m_climb = new ClimberSubsystem();
 
@@ -70,7 +70,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Configure your button bindings here
-    m_navigatorController.a().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
+    //+m_navigatorController.a().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
 
     m_navigatorController.x().onTrue(Commands.runOnce(() -> m_climb.setClimb(ClimberConstants.ClimberPower), m_climb));
   }

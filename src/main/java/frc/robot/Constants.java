@@ -33,15 +33,20 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final class ClimberConstants {
-    public static final int ClimberCanID = 15;
-    public static final double ClimberPower = 3.0;
-  }
-  
   public static final class ControllerConstants {
     public static final int kNavigatorPort = 0;
     public static final int kOperatorPort = 1;
     public static final double kDriveDeadband = 0.05;
+  }
+
+  public static final class ClimberConstants {
+    public static final int ClimberCanID = 15;
+    public static final double ClimberPower = 3.0;
+  }
+
+  public static final class IntakeConstants {
+    public static final int kUpperIntakeCanID = 15;
+    public static final int kLowerIntakeCanID = 16;
   }
 
   public static final class VisionConstans {
