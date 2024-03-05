@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import org.photonvision.PhotonCamera;
-
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -40,8 +38,9 @@ public final class Constants {
   }
 
   public static final class ClimberConstants {
-    public static final int ClimberCanID = 20;
-    public static double ClimberPower = 3.0;
+    public static final int kRightClimberCanID = 11;
+    public static final int kLeftClimberCanID = 12;
+    public static double kClimberPower = 3.0;
   }
 
   public static final class IntakeConstants {

@@ -28,8 +28,8 @@ public class ShooterSubsystem extends SubsystemBase {
     m_leftMotor.follow(m_rightMotor, true);
   }
 
-  public void setShooter(double speed) {
-    m_rightMotor.set(speed);
+  public void shoot() {
+    m_rightMotor.set(ShooterConstants.kShooterPower);
   }
 
   public void stopShooter() {

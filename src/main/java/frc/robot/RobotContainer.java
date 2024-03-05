@@ -4,16 +4,11 @@
 
 package frc.robot;
 
-import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.ControllerConstants;
-import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.ShooterConstants;
-import frc.robot.commands.VisionAimTarget;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -62,7 +57,7 @@ public class RobotContainer {
     m_climb.setDefaultCommand(
       new RunCommand(
         () -> {
-          m_climb.setClimb(0.0);
+          m_climb.stopClimb();
         },
         m_climb)
     );
@@ -100,11 +95,11 @@ public class RobotContainer {
     //+m_navigatorController.b().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
 
     // m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_intake.setIntake(IntakeConstants.kUpperIntakePower, IntakeConstants.kLowerIntakePower), m_intake));
-    m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_intake.setIntake(IntakeConstants.kIntakePower), m_intake));
+    m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_intake.intake(), m_intake));
 
-    m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_shooter.setShooter(ShooterConstants.kShooterPower), m_shooter));
+    m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_shooter.shoot(), m_shooter));
 
-    m_operatorController.x().onTrue(Commands.runOnce(() -> m_climb.setClimb(ClimberConstants.ClimberPower), m_climb));
+    m_operatorController.x().onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb));
 
     m_operatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));
 
