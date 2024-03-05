@@ -4,14 +4,50 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkLimitSwitch;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
+  private CANSparkMax m_upper = new CANSparkMax(IntakeConstants.kUpperIntakeCanID, MotorType.kBrushless);
+  private CANSparkMax m_lower = new CANSparkMax(IntakeConstants.kLowerIntakeCanID, MotorType.kBrushless);
+
+  // IR sensor
+  private SparkLimitSwitch m_noteLimit = m_lower.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
+
   /** Creates a new IntakeSubsystem. */
-  public IntakeSubsystem() {}
+  public IntakeSubsystem() {
+    m_upper.restoreFactoryDefaults();
+    m_lower.restoreFactoryDefaults();
+
+    m_upper.setIdleMode(IdleMode.kBrake);
+    m_lower.setIdleMode(IdleMode.kBrake);
+
+    m_noteLimit.enableLimitSwitch(false);
+    SmartDashboard.putBoolean("Note IR Sensor", m_noteLimit.isLimitSwitchEnabled());
+  }
+
+  public void setIntake(double upperSpeed, double lowerSpeed) {
+    m_upper.set(upperSpeed);
+    m_lower.set(lowerSpeed);
+  }
+
+  public void stopIntake() {
+    m_upper.set(0);
+    m_lower.set(0);
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    m_noteLimit.enableLimitSwitch(SmartDashboard.getBoolean("Note IR Sensor", false));
+    if (m_noteLimit.isPressed()) {
+      stopIntake();
+    }
   }
 }

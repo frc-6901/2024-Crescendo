@@ -6,9 +6,11 @@ package frc.robot;
 
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.commands.VisionAimTarget;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,9 +33,14 @@ public class RobotContainer {
   private final CommandXboxController m_navigatorController =
       new CommandXboxController(ControllerConstants.kNavigatorPort);
 
+  private final CommandXboxController m_operatorController = 
+      new CommandXboxController(ControllerConstants.kOperatorPort);
+
   //private final VisionSubsystem m_vision = new VisionSubsystem();
 
   private final ClimberSubsystem m_climb = new ClimberSubsystem();
+
+  private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -56,6 +63,14 @@ public class RobotContainer {
         m_climb)
     );
 
+    m_intake.setDefaultCommand(
+      new RunCommand(
+        () -> {
+          m_intake.stopIntake();
+        },
+        m_intake)
+    );
+
     configureBindings();
   }
 
@@ -72,9 +87,11 @@ public class RobotContainer {
     // Configure your button bindings here
     //+m_navigatorController.b().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
 
-    m_navigatorController.x().onTrue(Commands.runOnce(() -> m_climb.setClimb(ClimberConstants.ClimberPower), m_climb));
+    m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_intake.setIntake(IntakeConstants.kUpperIntakePower, IntakeConstants.kLowerIntakePower), m_intake));
 
-    m_navigatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));
+    m_operatorController.x().onTrue(Commands.runOnce(() -> m_climb.setClimb(ClimberConstants.ClimberPower), m_climb));
+
+    m_operatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));
 
     m_navigatorController.y().onTrue(m_robotDrive.zeroHeading());
   }

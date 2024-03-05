@@ -47,6 +47,9 @@ public final class Constants {
   public static final class IntakeConstants {
     public static final int kUpperIntakeCanID = 15;
     public static final int kLowerIntakeCanID = 16;
+
+    public static final double kUpperIntakePower = 10;
+    public static final double kLowerIntakePower = 10;
   }
 
   public static final class VisionConstans {
