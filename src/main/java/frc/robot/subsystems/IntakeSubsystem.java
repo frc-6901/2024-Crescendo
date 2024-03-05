@@ -28,24 +28,34 @@ public class IntakeSubsystem extends SubsystemBase {
     m_upper.setIdleMode(IdleMode.kBrake);
     m_lower.setIdleMode(IdleMode.kBrake);
 
+    m_lower.follow(m_upper, true);
+
     m_noteLimit.enableLimitSwitch(false);
     SmartDashboard.putBoolean("Note IR Sensor", m_noteLimit.isLimitSwitchEnabled());
   }
 
-  public void setIntake(double upperSpeed, double lowerSpeed) {
-    m_upper.set(upperSpeed);
-    m_lower.set(lowerSpeed);
+  public void setIntake(double speed) {
+    m_upper.set(speed);
   }
 
   public void stopIntake() {
-    m_upper.set(0);
-    m_lower.set(0);
+    setIntake(0);
+  }
+
+  public void increaseIntakePower() {
+    IntakeConstants.kIntakePower += 0.05;
+  }
+
+  public void decreaseIntakePower() {
+    IntakeConstants.kIntakePower -= 0.05;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     m_noteLimit.enableLimitSwitch(SmartDashboard.getBoolean("Note IR Sensor", false));
+    SmartDashboard.putNumber("Intake Power", IntakeConstants.kIntakePower);
+
     if (m_noteLimit.isPressed()) {
       stopIntake();
     }

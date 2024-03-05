@@ -7,10 +7,12 @@ package frc.robot;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.VisionAimTarget;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -42,6 +44,8 @@ public class RobotContainer {
 
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
+  private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -71,6 +75,14 @@ public class RobotContainer {
         m_intake)
     );
 
+    m_shooter.setDefaultCommand(
+      new RunCommand(
+        () -> {
+          m_shooter.stopShooter();
+        },
+        m_shooter)
+    );
+
     configureBindings();
   }
 
@@ -87,13 +99,23 @@ public class RobotContainer {
     // Configure your button bindings here
     //+m_navigatorController.b().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
 
-    m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_intake.setIntake(IntakeConstants.kUpperIntakePower, IntakeConstants.kLowerIntakePower), m_intake));
+    // m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_intake.setIntake(IntakeConstants.kUpperIntakePower, IntakeConstants.kLowerIntakePower), m_intake));
+    m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_intake.setIntake(IntakeConstants.kIntakePower), m_intake));
+
+    m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_shooter.setShooter(ShooterConstants.kShooterPower), m_shooter));
 
     m_operatorController.x().onTrue(Commands.runOnce(() -> m_climb.setClimb(ClimberConstants.ClimberPower), m_climb));
 
     m_operatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));
 
     m_navigatorController.y().onTrue(m_robotDrive.zeroHeading());
+
+    // Manual controls
+    m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_shooter.increaseShooterPower(), m_shooter));
+    m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_shooter.decreaseShooterPower(), m_shooter));
+
+    m_operatorController.povRight().onTrue(Commands.runOnce(() -> m_intake.increaseIntakePower(), m_intake));
+    m_operatorController.povLeft().onTrue(Commands.runOnce(() -> m_intake.decreaseIntakePower(), m_intake));
   }
 
   /**
