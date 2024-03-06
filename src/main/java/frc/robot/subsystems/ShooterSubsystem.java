@@ -32,6 +32,10 @@ public class ShooterSubsystem extends SubsystemBase {
     m_rightMotor.set(ShooterConstants.kShooterPower);
   }
 
+  public void shooterIntake() {
+    m_rightMotor.set(-ShooterConstants.kShooterPower);
+  }
+
   public void stopShooter() {
     m_rightMotor.set(0);
   }

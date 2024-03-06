@@ -40,14 +40,14 @@ public final class Constants {
   public static final class ClimberConstants {
     public static final int kRightClimberCanID = 11;
     public static final int kLeftClimberCanID = 12;
-    public static double kClimberPower = 3.0;
+    public static double kClimberPower = 0.75;
   }
 
   public static final class IntakeConstants {
     public static final int kUpperIntakeCanID = 15;
     public static final int kLowerIntakeCanID = 16;
 
-    public static double kIntakePower = 10;
+    public static double kIntakePower = 0.85;
     public static final double kUpperIntakePower = 10;
     public static final double kLowerIntakePower = 10;
   }
@@ -56,7 +56,7 @@ public final class Constants {
     public static final int kRightShooterCanID = 21;
     public static final int kLeftShooterCanID = 20;
 
-    public static double kShooterPower = 10;
+    public static double kShooterPower = 1.00;
     public static final double kRightShooterPower = 10;
     public static final double kLeftShooterPower = 10;
   }

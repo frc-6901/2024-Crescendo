@@ -99,6 +99,8 @@ public class RobotContainer {
 
     m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_shooter.shoot(), m_shooter));
 
+    m_operatorController.leftTrigger().onTrue(Commands.runOnce(() -> m_shooter.shooterIntake(), m_shooter));
+
     m_operatorController.x().onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb));
 
     m_operatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));

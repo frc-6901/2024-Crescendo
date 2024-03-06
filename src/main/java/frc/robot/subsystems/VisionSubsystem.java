@@ -90,6 +90,6 @@ public class VisionSubsystem extends SubsystemBase {
   public void periodic() {
     // Put the gyro angles on the SmartDashboard
     for (var target: getLatestResult().getTargets())
-      SmartDashboard.putNumber("target", target.getFiducialId());
+      SmartDashboard.putNumber("Target", target.getFiducialId());
   }
 }
