@@ -105,6 +105,8 @@ public class RobotContainer {
 
     m_operatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));
 
+    m_operatorController.b().onTrue(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
+
     m_navigatorController.y().onTrue(m_robotDrive.zeroHeading());
 
     // Manual controls

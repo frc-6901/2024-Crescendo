@@ -42,8 +42,8 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public void reverseClimb() {
-    ClimberConstants.kClimberPower *= -1;
-  }
+    m_RightClimber.set(-ClimberConstants.kClimberPower);
+    m_LeftClimber.set(-ClimberConstants.kClimberPower);  }
 
   public void stopClimb() {
     m_RightClimber.set(0);
