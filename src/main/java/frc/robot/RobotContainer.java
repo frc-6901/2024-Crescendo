@@ -62,21 +62,21 @@ public class RobotContainer {
         m_climb)
     );
 
-    m_intake.setDefaultCommand(
-      new RunCommand(
-        () -> {
-          m_intake.stopIntake();
-        },
-        m_intake)
-    );
+    // m_intake.setDefaultCommand(
+    //   new RunCommand(
+    //     () -> {
+    //       m_intake.stopIntake();
+    //     },
+    //     m_intake)
+    // );
 
-    m_shooter.setDefaultCommand(
-      new RunCommand(
-        () -> {
-          m_shooter.stopShooter();
-        },
-        m_shooter)
-    );
+    // m_shooter.setDefaultCommand(
+    //   new RunCommand(
+    //     () -> {
+    //       m_shooter.stopShooter();
+    //     },
+    //     m_shooter)
+    // );
 
     configureBindings();
   }
@@ -97,9 +97,20 @@ public class RobotContainer {
     // m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_intake.setIntake(IntakeConstants.kUpperIntakePower, IntakeConstants.kLowerIntakePower), m_intake));
     m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_intake.intake(), m_intake));
 
-    m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_shooter.shoot(), m_shooter));
+    // Shoot into SPEAKER
+    m_operatorController.rightBumper()
+      .onTrue(Commands.runOnce(() -> m_shooter.shoot(), m_shooter))
+      .onFalse(Commands.runOnce(() -> m_shooter.stopShooter(), m_shooter));
 
-    m_operatorController.leftTrigger().onTrue(Commands.runOnce(() -> m_shooter.shooterIntake(), m_shooter));
+    // COLLECTION Intake
+    m_operatorController.leftTrigger()
+      .onTrue(Commands.runOnce(() -> m_shooter.shooterIntake(), m_shooter))
+      .onFalse(Commands.runOnce(() -> m_shooter.stopShooter(), m_shooter));
+
+    // Shoot into AMP
+    m_operatorController.rightTrigger()
+      .onTrue(Commands.runOnce(() -> m_shooter.shootAmp(), m_shooter))
+      .onFalse(Commands.runOnce(() -> m_shooter.stopShooter(), m_shooter));
 
     m_operatorController.x().onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb));
 
