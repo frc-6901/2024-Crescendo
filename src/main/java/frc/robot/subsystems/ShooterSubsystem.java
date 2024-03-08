@@ -24,6 +24,9 @@ public class ShooterSubsystem extends SubsystemBase {
     m_rightMotor.setIdleMode(IdleMode.kBrake);
     m_leftMotor.setIdleMode(IdleMode.kBrake);
 
+    m_rightMotor.setOpenLoopRampRate(1);
+    m_leftMotor.setOpenLoopRampRate(1);
+
     // Follow the right motor inversly
     m_rightMotor.follow(m_leftMotor, true);
   }

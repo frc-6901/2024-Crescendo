@@ -95,8 +95,10 @@ public class RobotContainer {
     //+m_navigatorController.b().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
 
     // m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_intake.setIntake(IntakeConstants.kUpperIntakePower, IntakeConstants.kLowerIntakePower), m_intake));
-    m_operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_intake.intake(), m_intake));
-
+    m_operatorController.leftBumper()
+      .onTrue(Commands.runOnce(() -> m_intake.intake(), m_intake))
+      .onFalse(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
+    
     // Shoot into SPEAKER
     m_operatorController.rightBumper()
       .onTrue(Commands.runOnce(() -> m_shooter.shoot(), m_shooter))
@@ -112,11 +114,15 @@ public class RobotContainer {
       .onTrue(Commands.runOnce(() -> m_shooter.shootAmp(), m_shooter))
       .onFalse(Commands.runOnce(() -> m_shooter.stopShooter(), m_shooter));
 
-    m_operatorController.x().onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb));
+      m_operatorController.a()
+        .onTrue(Commands.runOnce(() -> m_intake.outtake(), m_intake))
+        .onFalse(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
 
-    m_operatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));
+    // m_operatorController.x().onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb));
 
-    m_operatorController.b().onTrue(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
+    // m_operatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));
+
+    // m_operatorController.b().onTrue(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
 
     m_navigatorController.y().onTrue(m_robotDrive.zeroHeading());
 
