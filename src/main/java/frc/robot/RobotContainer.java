@@ -10,11 +10,20 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.util.Units;
+import com.pathplanner.lib.auto.NamedCommands;
 // import com.fasterxml.jackson.databind.PropertyNamingStrategies.KebabCaseStrategy;
 // import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -28,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  private final SendableChooser<Command> autoChooser;
   // The robot's subsystems and commands are defined here...
 
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
@@ -45,7 +55,6 @@ public class RobotContainer {
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
   private final ShooterSubsystem m_shooter = new ShooterSubsystem();
-
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -74,7 +83,15 @@ public class RobotContainer {
         },
         m_intake)
     );
+    // Build an auto chooser. This will use Commands.none() as the default option.
+    autoChooser = AutoBuilder.buildAutoChooser();
 
+    // Another option that allows you to specify the default auto by its name
+    // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    
     // m_shooter.setDefaultCommand(
     //   new RunCommand(
     //     () -> {
@@ -93,7 +110,7 @@ public class RobotContainer {
     // NamedCommands.registerCommand(null, getAutonomousCommand());
     configureBindings();
   }
-
+  
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
@@ -104,6 +121,21 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+
+    Pose2d targetPose = new Pose2d(10, 5, Rotation2d.fromDegrees(180));
+
+// Create the constraints to use while pathfinding
+PathConstraints constraints = new PathConstraints(
+        3.0, 4.0,
+        Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+// Since AutoBuilder is configured, we can use it to build pathfinding commands
+Command pathfindingCommand = AutoBuilder.pathfindToPose(
+        targetPose,
+        constraints,
+        0.0, // Goal end velocity in meters/sec
+        0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
+);
     // Configure your button bindings here
     //+m_navigatorController.b().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
 
@@ -153,14 +185,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto(
-      "MiddleNode1");
-    //MiddleNode1
-    //RightNode1
-    //LeftNode1
-    //Move
-    //MiddleFar
-    //LeftAmp
-    //Right2Nodes
+    return autoChooser.getSelected();
   }
 }
