@@ -28,7 +28,7 @@ public class IntakeSubsystem extends SubsystemBase {
     m_upper.setIdleMode(IdleMode.kBrake);
     m_lower.setIdleMode(IdleMode.kBrake);
 
-    m_lower.follow(m_upper, true);
+    //m_lower.follow(m_upper, true);
 
     m_noteLimit.enableLimitSwitch(true);
     SmartDashboard.putBoolean("Note IR Sensor", m_noteLimit.isLimitSwitchEnabled());
@@ -36,14 +36,17 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void intake() {
     m_upper.set(IntakeConstants.kIntakePower);
+    m_lower.set(IntakeConstants.kIntakePower);
   }
 
   public void outtake() {
     m_upper.set(-IntakeConstants.kIntakePower);
-  }
+    m_lower.set(-IntakeConstants.kIntakePower);
+}
 
   public void stopIntake() {
     m_upper.set(0);
+    m_lower.set(0);
   }
 
   public void increaseIntakePower() {

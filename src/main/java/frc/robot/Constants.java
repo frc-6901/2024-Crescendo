@@ -48,8 +48,6 @@ public final class Constants {
     public static final int kLowerIntakeCanID = 16;
 
     public static double kIntakePower = 0.85;
-    public static final double kUpperIntakePower = 10;
-    public static final double kLowerIntakePower = 10;
   }
 
   public static final class ShooterConstants {
@@ -57,8 +55,8 @@ public final class Constants {
     public static final int kLeftShooterCanID = 20;
 
     public static double kShooterPower = 1.00;
-    public static final double kRightShooterPower = 10;
-    public static final double kLeftShooterPower = 10;
+    public static double kShooterAmpPower = 0.2;
+    public static double kShooterIntakePower = -0.15;
   }
 
   public static final class VisionConstans {

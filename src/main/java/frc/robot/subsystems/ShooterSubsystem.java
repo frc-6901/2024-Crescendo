@@ -25,19 +25,23 @@ public class ShooterSubsystem extends SubsystemBase {
     m_leftMotor.setIdleMode(IdleMode.kBrake);
 
     // Follow the right motor inversly
-    m_leftMotor.follow(m_rightMotor, true);
+    m_rightMotor.follow(m_leftMotor, true);
   }
 
   public void shoot() {
-    m_rightMotor.set(ShooterConstants.kShooterPower);
+    m_leftMotor.set(ShooterConstants.kShooterPower);
+  }
+
+  public void shootAmp() {
+    m_leftMotor.set(ShooterConstants.kShooterAmpPower);
   }
 
   public void shooterIntake() {
-    m_rightMotor.set(-ShooterConstants.kShooterPower);
+    m_leftMotor.set(ShooterConstants.kShooterIntakePower);
   }
 
   public void stopShooter() {
-    m_rightMotor.set(0);
+    m_leftMotor.set(0);
   }
 
   public void increaseShooterPower() {
