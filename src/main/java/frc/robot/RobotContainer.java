@@ -9,6 +9,9 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -119,10 +122,18 @@ public class RobotContainer {
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *Sam is a wierd monkey :()
+   *Sam is a weird monkey :) ()
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new Command() {};
+    return new PathPlannerAuto(
+      "MiddleNode1");
+    //MiddleNode1
+    //RightNode1
+    //LeftNode1
+    //Move
+    //MiddleFar
+    //LeftAmp
+    //Right2Nodes
   }
 }
