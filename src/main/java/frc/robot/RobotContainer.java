@@ -10,6 +10,8 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
+// import com.fasterxml.jackson.databind.PropertyNamingStrategies.KebabCaseStrategy;
+// import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.MathUtil;
@@ -65,13 +67,13 @@ public class RobotContainer {
         m_climb)
     );
 
-    // m_intake.setDefaultCommand(
-    //   new RunCommand(
-    //     () -> {
-    //       m_intake.stopIntake();
-    //     },
-    //     m_intake)
-    // );
+    m_intake.setDefaultCommand(
+      new RunCommand(
+        () -> {
+          m_intake.stopIntake();
+        },
+        m_intake)
+    );
 
     // m_shooter.setDefaultCommand(
     //   new RunCommand(
@@ -80,7 +82,15 @@ public class RobotContainer {
     //     },
     //     m_shooter)
     // );
-
+    // NamedCommands.registerCommand("Wait", m_robotDrive.wait(1));
+    // NamedCommands.registerCommand(null, getAutonomousCommand());
+    // NamedCommands.registerCommand(null, getAutonomousCommand());
+    // NamedCommands.registerCommand(null, getAutonomousCommand());
+    // NamedCommands.registerCommand(null, getAutonomousCommand());
+    // NamedCommands.registerCommand(null, getAutonomousCommand());
+    // NamedCommands.registerCommand(null, getAutonomousCommand());
+    // NamedCommands.registerCommand(null, getAutonomousCommand());
+    // NamedCommands.registerCommand(null, getAutonomousCommand());
     configureBindings();
   }
 
