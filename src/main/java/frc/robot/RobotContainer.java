@@ -26,7 +26,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -122,20 +125,20 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-    Pose2d targetPose = new Pose2d(10, 5, Rotation2d.fromDegrees(180));
+//     Pose2d targetPose = new Pose2d(10, 5, Rotation2d.fromDegrees(180));
 
-// Create the constraints to use while pathfinding
-PathConstraints constraints = new PathConstraints(
-        3.0, 4.0,
-        Units.degreesToRadians(540), Units.degreesToRadians(720));
+// // Create the constraints to use while pathfinding
+// PathConstraints constraints = new PathConstraints(
+//         3.0, 4.0,
+//         Units.degreesToRadians(540), Units.degreesToRadians(720));
 
-// Since AutoBuilder is configured, we can use it to build pathfinding commands
-Command pathfindingCommand = AutoBuilder.pathfindToPose(
-        targetPose,
-        constraints,
-        0.0, // Goal end velocity in meters/sec
-        0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-);
+// // Since AutoBuilder is configured, we can use it to build pathfinding commands
+// Command pathfindingCommand = AutoBuilder.pathfindToPose(
+//         targetPose,
+//         constraints,
+//         0.0, // Goal end velocity in meters/sec
+//         0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
+// );
     // Configure your button bindings here
     //+m_navigatorController.b().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
 
@@ -163,11 +166,11 @@ Command pathfindingCommand = AutoBuilder.pathfindToPose(
         .onTrue(Commands.runOnce(() -> m_intake.outtake(), m_intake))
         .onFalse(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
 
-    // m_operatorController.x().onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb));
+    m_operatorController.x().onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb));
 
-    // m_operatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));
+    m_operatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));
 
-    // m_operatorController.b().onTrue(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
+    m_operatorController.b().onTrue(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
 
     m_navigatorController.y().onTrue(m_robotDrive.zeroHeading());
 
@@ -184,7 +187,28 @@ Command pathfindingCommand = AutoBuilder.pathfindToPose(
    *Sam is a weird monkey :) ()
    * @return the command to run in autonomous
    */
+  // public Command getAutonomousCommand() {
+  //   return autoChooser.getSelected();
+  // }
+
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
-  }
+        SequentialCommandGroup MiddleShoot = new SequentialCommandGroup(
+            m_robotDrive.zeroHeading(),
+            new InstantCommand(
+              () -> m_robotDrive.drive(0.2, 0, 0, false, false), 
+              m_robotDrive),
+            new WaitCommand(0.3),
+            new InstantCommand(
+              () -> m_robotDrive.drive(0, 0, 0, false, false),
+              m_robotDrive),
+            new InstantCommand(
+              () -> m_shooter.shoot(),
+              m_shooter),
+            new WaitCommand(0.2),
+            new InstantCommand(
+              () -> m_shooter.stopShooter(),
+              m_shooter)
+            );
+        return MiddleShoot;
+    }
 }
