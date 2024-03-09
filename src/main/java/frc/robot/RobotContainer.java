@@ -68,13 +68,13 @@ public class RobotContainer {
                     true, true),
                 m_robotDrive));
     
-    m_climb.setDefaultCommand(
-      new RunCommand(
-        () -> {
-          m_climb.stopClimb();
-        },
-        m_climb)
-    );
+    // m_climb.setDefaultCommand(
+    //   new RunCommand(
+    //     () -> {
+    //       m_climb.stopClimb();
+    //     },
+    //     m_climb)
+    // );
 
     m_intake.setDefaultCommand(
       new RunCommand(
