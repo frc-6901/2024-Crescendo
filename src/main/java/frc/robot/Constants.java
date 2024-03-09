@@ -6,10 +6,21 @@ package frc.robot;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+
+
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -23,7 +34,48 @@ public final class Constants {
   public static final class ControllerConstants {
     public static final int kNavigatorPort = 0;
     public static final int kOperatorPort = 1;
-    public static final double kDriveDeadband = 0.1;
+    public static final double kDriveDeadband = 0.05;
+  }
+
+  public static final class ClimberConstants {
+    public static final int kRightClimberCanID = 11;
+    public static final int kLeftClimberCanID = 12;
+    public static double kClimberPower = 0.75;
+  }
+
+  public static final class IntakeConstants {
+    public static final int kUpperIntakeCanID = 15;
+    public static final int kLowerIntakeCanID = 16;
+
+    public static double kIntakePower = 0.85;
+  }
+
+  public static final class ShooterConstants {
+    public static final int kRightShooterCanID = 21;
+    public static final int kLeftShooterCanID = 20;
+
+    public static double kShooterPower = 0.85;
+    public static double kShooterAmpPower = 0.2;
+    public static double kShooterIntakePower = -0.15;
+  }
+
+  public static final class VisionConstans {
+    public static final String kCameraName = "Arducam_OV9281_USB_Camera";
+        // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
+        public static final Transform3d kRobotToCam =
+                new Transform3d(new Translation3d(0.5, 0.0, 0), new Rotation3d(0, 0, 0));
+
+        // The layout of the AprilTags on the field
+        public static final AprilTagFieldLayout kTagLayout =
+                AprilTagFields.kDefaultField.loadAprilTagLayoutField();
+
+        // The standard deviations of our vision estimated poses, which affect correction rate
+        // (Fake values. Experiment and determine estimation noise on an actual robot.)
+        public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+        public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+
+        public static final double kVisionP = 0.28;
+        public static final double kVisionD = 0.0;
   }
 
   public static final class DriveConstants {
@@ -37,9 +89,9 @@ public final class Constants {
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(24.5);
+    public static final double kTrackWidth = Units.inchesToMeters(26);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(24.5);
+    public static final double kWheelBase = Units.inchesToMeters(26);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -54,14 +106,14 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontRightTurningCanId = 1;
-    public static final int kFrontRightDrivingCanId = 2;
-    public static final int kFrontLeftTurningCanId = 3;
-    public static final int kFrontLeftDrivingCanId = 4;
-    public static final int kRearLeftTurningCanId = 5;
-    public static final int kRearLeftDrivingCanId = 6;
-    public static final int kRearRightTurningCanId = 7;
-    public static final int kRearRightDrivingCanId = 8;
+    public static final int kFrontLeftDrivingCanId = 1;
+    public static final int kFrontLeftTurningCanId = 2;
+    public static final int kFrontRightDrivingCanId = 3;
+    public static final int kFrontRightTurningCanId = 4;
+    public static final int kRearLeftDrivingCanId = 5;
+    public static final int kRearLeftTurningCanId = 6;
+    public static final int kRearRightDrivingCanId = 7;
+    public static final int kRearRightTurningCanId = 8;
 
     // Pigeon Gyro
     public static final int kPigeonIMUId = 20;

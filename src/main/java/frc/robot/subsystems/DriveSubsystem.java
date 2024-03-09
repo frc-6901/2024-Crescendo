@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,15 +14,23 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
+// import frc.robot.Constants;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+// import com.ctre.phoenix6.mechanisms.swerve.SimSwerveDrivetrain.SimSwerveModule;
 
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
+  private SimSwerveModule[] modules;
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
@@ -64,10 +73,82 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
       });
-
+      
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    AutoBuilder.configureHolonomic(
+            this::getPose, // Robot pose supplier
+            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+                    4.5, // Max module speed, in m/s
+                    0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+                    new ReplanningConfig() // Default path replanning config. See the API for the options here
+            ),
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+
   }
+
+  public SwerveModuleState[] getModuleStates() {
+    SwerveModuleState[] states = new SwerveModuleState[modules.length];
+    for (int i = 0; i < modules.length; i++) {
+      states[i] = modules[i].getState();
+    }
+    return states;
+  }
+  public void setStates(SwerveModuleState[] targetStates) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, DriveConstants.kMaxSpeedMetersPerSecond);
+
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].setTargetState(targetStates[i]);
+    }
+  }
+
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
+  }
+
+  public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
+    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
+
+    SwerveModuleState[] targetStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(targetSpeeds);
+    setStates(targetStates);
+  }
+
+  class SimSwerveModule {
+    private SwerveModulePosition currentPosition = new SwerveModulePosition();
+    private SwerveModuleState currentState = new SwerveModuleState();
+
+    public SwerveModulePosition getPosition() {
+      return currentPosition;
+    }
+    
+  public SwerveModuleState getState() {
+    return currentState;
+  }
+  public void setTargetState(SwerveModuleState targetState) {
+    // Optimize the state
+    currentState = SwerveModuleState.optimize(targetState, currentState.angle);
+
+    currentPosition = new SwerveModulePosition(currentPosition.distanceMeters + (currentState.speedMetersPerSecond * 0.02), currentState.angle);
+  }
+  }
+
 
   @Override
   public void periodic() {
@@ -89,6 +170,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Gyro Yaw", ypr[0]);
     SmartDashboard.putNumber("Gyro Pitch", ypr[1]);
     SmartDashboard.putNumber("Gyro Roll", ypr[2]);
+    SmartDashboard.putNumber("Gyro Turn Rate", getTurnRate());
   }
 
   /**
@@ -107,7 +189,7 @@ public class DriveSubsystem extends SubsystemBase {
    
    * @param pose The pose to which to set the odometry.
    */
-  public void resetOdometry(Pose2d pose) {
+  public void resetPose(Pose2d pose) {
     double[] ypr = new double[3];
     m_gyro.getYawPitchRoll(ypr);
     double gyroAngle = Math.toRadians(ypr[0]);
@@ -133,7 +215,7 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    * @param rateLimit     Whether to enable rate limiting for smoother control.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean rateLimit) {
+  public void drive(double xSpeed, double ySpeed, double rot, boolean rateLimit, boolean fieldRelative) {
     
     double xSpeedCommanded;
     double ySpeedCommanded;
@@ -190,23 +272,36 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
 
-    // Gyro offset for field-relative control
-    double[] ypr = new double[3];
-    m_gyro.getYawPitchRoll(ypr);
-    double gyroAngle = Math.toRadians(ypr[0]);
+    if (fieldRelative) {
+      // Gyro offset for field-relative control
+      double[] ypr = new double[3];
+      m_gyro.getYawPitchRoll(ypr);
+      double gyroAngle = Math.toRadians(ypr[0]);
 
-    double temp = ySpeedCommanded * Math.cos(gyroAngle) + xSpeedCommanded * Math.sin(gyroAngle);
-    xSpeedCommanded = -ySpeedCommanded * Math.sin(gyroAngle) + xSpeedCommanded * Math.cos(gyroAngle);
-    ySpeedCommanded = temp;
+      double temp = ySpeedCommanded * Math.cos(gyroAngle) + xSpeedCommanded * Math.sin(gyroAngle);
+      xSpeedCommanded = -ySpeedCommanded * Math.sin(gyroAngle) + xSpeedCommanded * Math.cos(gyroAngle);
+      ySpeedCommanded = temp;
 
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(ypr[0])));
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+      var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(ypr[0])));
+      SwerveDriveKinematics.desaturateWheelSpeeds(
+          swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+      
+      m_frontLeft.setDesiredState(swerveModuleStates[0]);
+      m_frontRight.setDesiredState(swerveModuleStates[1]);
+      m_rearLeft.setDesiredState(swerveModuleStates[2]);
+      m_rearRight.setDesiredState(swerveModuleStates[3]);
+    }
+
+    else {
+      var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+      SwerveDriveKinematics.desaturateWheelSpeeds(
+          swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+      
+      m_frontLeft.setDesiredState(swerveModuleStates[0]);
+      m_frontRight.setDesiredState(swerveModuleStates[1]);
+      m_rearLeft.setDesiredState(swerveModuleStates[2]);
+      m_rearRight.setDesiredState(swerveModuleStates[3]);
+    }
   }
 
   /**
@@ -241,6 +336,13 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.resetEncoders();
   }
 
+  /** Zeroes the heading of the robot. */
+  public Command zeroHeading() {
+    return runOnce(
+      () -> {
+        m_gyro.setYaw(0);
+      });
+  }
 
   /**
    * Returns the heading of the robot.
