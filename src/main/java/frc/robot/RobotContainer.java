@@ -40,7 +40,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  private final SendableChooser<Command> autoChooser;
+  // private final SendableChooser<Command> autoChooser;
   // The robot's subsystems and commands are defined here...
 
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
@@ -79,20 +79,20 @@ public class RobotContainer {
     //     m_climb)
     // );
 
-    m_intake.setDefaultCommand(
-      new RunCommand(
-        () -> {
-          m_intake.stopIntake();
-        },
-        m_intake)
-    );
+    // m_intake.setDefaultCommand(
+    //   new RunCommand(
+    //     () -> {
+    //       m_intake.stopIntake();
+    //     },
+    //     m_intake)
+    // );
     // Build an auto chooser. This will use Commands.none() as the default option.
-    autoChooser = AutoBuilder.buildAutoChooser();
+    // autoChooser = AutoBuilder.buildAutoChooser();
 
     // Another option that allows you to specify the default auto by its name
     // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
 
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    // SmartDashboard.putData("Auto Chooser", autoChooser);
 
     
     // m_shooter.setDefaultCommand(
@@ -143,12 +143,14 @@ public class RobotContainer {
     //+m_navigatorController.b().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
 
     // m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_intake.setIntake(IntakeConstants.kUpperIntakePower, IntakeConstants.kLowerIntakePower), m_intake));
-    m_operatorController.leftBumper()
+    
+    // Intake
+    m_operatorController.rightBumper()
       .onTrue(Commands.runOnce(() -> m_intake.intake(), m_intake))
       .onFalse(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
     
     // Shoot into SPEAKER
-    m_operatorController.rightBumper()
+    m_operatorController.leftBumper()
       .onTrue(Commands.runOnce(() -> m_shooter.shoot(), m_shooter))
       .onFalse(Commands.runOnce(() -> m_shooter.stopShooter(), m_shooter));
 
@@ -162,16 +164,25 @@ public class RobotContainer {
       .onTrue(Commands.runOnce(() -> m_shooter.shootAmp(), m_shooter))
       .onFalse(Commands.runOnce(() -> m_shooter.stopShooter(), m_shooter));
 
-      m_operatorController.a()
-        .onTrue(Commands.runOnce(() -> m_intake.outtake(), m_intake))
-        .onFalse(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
+    // Reverse Intake
+    m_operatorController.y()
+      .onTrue(Commands.runOnce(() -> m_intake.outtake(), m_intake))
+      .onFalse(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
+    
+    // Climb
+    m_operatorController.x()
+      .onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb))
+      .onFalse(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
 
-    m_operatorController.x().onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb));
+    // Reverse Climb
+    m_operatorController.a()
+      .onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb))
+      .onFalse(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
 
-    m_operatorController.a().onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb));
-
+    // Stop Climber
     m_operatorController.b().onTrue(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
 
+    // Reset Gyro
     m_navigatorController.y().onTrue(m_robotDrive.zeroHeading());
 
     // Manual controls
@@ -192,23 +203,68 @@ public class RobotContainer {
   // }
 
   public Command getAutonomousCommand() {
-        SequentialCommandGroup MiddleShoot = new SequentialCommandGroup(
-            m_robotDrive.zeroHeading(),
-            new InstantCommand(
-              () -> m_robotDrive.drive(0.2, 0, 0, false, false), 
-              m_robotDrive),
-            new WaitCommand(0.3),
-            new InstantCommand(
-              () -> m_robotDrive.drive(0, 0, 0, false, false),
-              m_robotDrive),
-            new InstantCommand(
-              () -> m_shooter.shoot(),
-              m_shooter),
-            new WaitCommand(0.2),
-            new InstantCommand(
-              () -> m_shooter.stopShooter(),
-              m_shooter)
-            );
-        return MiddleShoot;
+    // SequentialCommandGroup MiddleShoot = new SequentialCommandGroup(
+    //     m_robotDrive.zeroHeading(),
+    //     new InstantCommand(
+    //       () -> m_shooter.shoot(),
+    //       m_shooter
+    //     ),
+    //     new InstantCommand(
+    //       () -> m_shooter.stopShooter(),
+    //       m_shooter
+    //     ),
+    //     new WaitCommand(10),
+    //     new InstantCommand(
+    //       () -> m_robotDrive.drive(0.2, 0, 0, false, false), 
+    //       m_robotDrive),
+    //     new WaitCommand(1.5),
+    //     new InstantCommand(
+    //       () -> m_robotDrive.drive(0, 0, 0, false, false),
+    //       m_robotDrive
+    //     )
+    // );
+
+    SequentialCommandGroup driveForward = new SequentialCommandGroup(
+      new InstantCommand(
+        () -> m_robotDrive.drive(0, 0.75, 0, false, false),
+        m_robotDrive
+      ),
+
+      new WaitCommand(3),
+
+      new InstantCommand(
+        () -> m_robotDrive.drive(0, 0, 0, false, false)
+      )
+    );
+
+    SequentialCommandGroup shootSpeaker = new SequentialCommandGroup(
+      new InstantCommand(
+        () -> m_shooter.shoot(),
+        m_shooter
+      ),
+
+      new WaitCommand(2),
+
+      new InstantCommand(
+        () -> m_intake.intake(),
+        m_intake
+      ),
+
+      new WaitCommand(2),
+
+      new InstantCommand(
+        () -> m_shooter.stopShooter(),
+        m_shooter
+      ),
+
+      new InstantCommand(
+        () -> m_intake.stopIntake(),
+        m_intake
+      )
+    );
+    
+    return shootSpeaker;
+    // return driveForward;
+    // return null;
     }
 }

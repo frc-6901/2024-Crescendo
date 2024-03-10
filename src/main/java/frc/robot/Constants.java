@@ -40,6 +40,7 @@ public final class Constants {
   public static final class ClimberConstants {
     public static final int kRightClimberCanID = 11;
     public static final int kLeftClimberCanID = 12;
+    
     public static double kClimberPower = 0.75;
   }
 
