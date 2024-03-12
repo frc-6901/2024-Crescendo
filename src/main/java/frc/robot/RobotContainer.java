@@ -53,7 +53,7 @@ public class RobotContainer {
 
   //private final VisionSubsystem m_vision = new VisionSubsystem();
 
-  private final ClimberSubsystem m_climb = new ClimberSubsystem();
+  //private final ClimberSubsystem m_climb = new ClimberSubsystem();
 
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
@@ -169,18 +169,18 @@ public class RobotContainer {
       .onTrue(Commands.runOnce(() -> m_intake.outtake(), m_intake))
       .onFalse(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
     
-    // Climb
-    m_operatorController.x()
-      .onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb))
-      .onFalse(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
+    // // Climb
+    // m_operatorController.x()
+    //   .onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb))
+    //   .onFalse(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
 
-    // Reverse Climb
-    m_operatorController.a()
-      .onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb))
-      .onFalse(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
+    // // Reverse Climb
+    // m_operatorController.a()
+    //   .onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb))
+    //   .onFalse(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
 
-    // Stop Climber
-    m_operatorController.b().onTrue(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
+    // // Stop Climber
+    // m_operatorController.b().onTrue(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
 
     // Reset Gyro
     m_navigatorController.y().onTrue(m_robotDrive.zeroHeading());
@@ -250,7 +250,7 @@ public class RobotContainer {
         m_intake
       ),
 
-      new WaitCommand(2),
+      new WaitCommand(1),
 
       new InstantCommand(
         () -> m_shooter.stopShooter(),
@@ -263,8 +263,8 @@ public class RobotContainer {
       )
     );
     
-    return shootSpeaker;
+    // return shootSpeaker;
     // return driveForward;
-    // return null;
+    return null;
     }
 }

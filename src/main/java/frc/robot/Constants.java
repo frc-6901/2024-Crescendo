@@ -34,7 +34,7 @@ public final class Constants {
   public static final class ControllerConstants {
     public static final int kNavigatorPort = 0;
     public static final int kOperatorPort = 1;
-    public static final double kDriveDeadband = 0.05;
+    public static final double kDriveDeadband = 0.1;
   }
 
   public static final class ClimberConstants {
@@ -56,7 +56,7 @@ public final class Constants {
     public static final int kLeftShooterCanID = 20;
 
     public static double kShooterPower = 0.85;
-    public static double kShooterAmpPower = 0.2;
+    public static double kShooterAmpPower = 0.2
     public static double kShooterIntakePower = -0.15;
   }
 
