@@ -29,6 +29,8 @@ public class ClimberSubsystem extends SubsystemBase {
     m_RightClimber.setIdleMode(IdleMode.kBrake);
     m_LeftClimber.setIdleMode(IdleMode.kBrake);
 
+    // m_LeftClimber.follow(m_RightClimber);
+
     m_RightReverseLimit.enableLimitSwitch(true);
     m_LeftReverseLimit.enableLimitSwitch(true);
 
@@ -43,7 +45,8 @@ public class ClimberSubsystem extends SubsystemBase {
 
   public void reverseClimb() {
     m_RightClimber.set(-ClimberConstants.kClimberPower);
-    m_LeftClimber.set(-ClimberConstants.kClimberPower);  }
+    m_LeftClimber.set(-ClimberConstants.kClimberPower);  
+  }
 
   public void stopClimb() {
     m_RightClimber.set(0);
@@ -66,5 +69,7 @@ public class ClimberSubsystem extends SubsystemBase {
     if (m_LeftReverseLimit.isPressed()) {
       m_LeftClimber.set(0);
     }
+
+    
   }
 }

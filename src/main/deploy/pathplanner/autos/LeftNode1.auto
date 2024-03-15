@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Move1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SecondLeft1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ThirdLeft1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FourthLeft1"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

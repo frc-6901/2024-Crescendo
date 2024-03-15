@@ -34,12 +34,13 @@ public final class Constants {
   public static final class ControllerConstants {
     public static final int kNavigatorPort = 0;
     public static final int kOperatorPort = 1;
-    public static final double kDriveDeadband = 0.05;
+    public static final double kDriveDeadband = 0.1;
   }
 
   public static final class ClimberConstants {
     public static final int kRightClimberCanID = 11;
     public static final int kLeftClimberCanID = 12;
+    
     public static double kClimberPower = 0.75;
   }
 
@@ -48,17 +49,15 @@ public final class Constants {
     public static final int kLowerIntakeCanID = 16;
 
     public static double kIntakePower = 0.85;
-    public static final double kUpperIntakePower = 10;
-    public static final double kLowerIntakePower = 10;
   }
 
   public static final class ShooterConstants {
     public static final int kRightShooterCanID = 21;
     public static final int kLeftShooterCanID = 20;
 
-    public static double kShooterPower = 1.00;
-    public static final double kRightShooterPower = 10;
-    public static final double kLeftShooterPower = 10;
+    public static double kShooterPower = 0.85;
+    public static double kShooterAmpPower = 0.2;
+    public static double kShooterIntakePower = -0.15;
   }
 
   public static final class VisionConstans {
@@ -108,10 +107,10 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontRightDrivingCanId = 1;
-    public static final int kFrontRightTurningCanId = 2;
-    public static final int kFrontLeftDrivingCanId = 3;
-    public static final int kFrontLeftTurningCanId = 4;
+    public static final int kFrontLeftDrivingCanId = 1;
+    public static final int kFrontLeftTurningCanId = 2;
+    public static final int kFrontRightDrivingCanId = 3;
+    public static final int kFrontRightTurningCanId = 4;
     public static final int kRearLeftDrivingCanId = 5;
     public static final int kRearLeftTurningCanId = 6;
     public static final int kRearRightDrivingCanId = 7;

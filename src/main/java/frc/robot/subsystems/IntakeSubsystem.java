@@ -18,7 +18,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private CANSparkMax m_lower = new CANSparkMax(IntakeConstants.kLowerIntakeCanID, MotorType.kBrushless);
 
   // IR sensor
-  private SparkLimitSwitch m_noteLimit = m_lower.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
+  //private SparkLimitSwitch m_noteLimit = m_lower.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
@@ -28,10 +28,13 @@ public class IntakeSubsystem extends SubsystemBase {
     m_upper.setIdleMode(IdleMode.kBrake);
     m_lower.setIdleMode(IdleMode.kBrake);
 
-    m_lower.follow(m_upper, true);
+    m_upper.setOpenLoopRampRate(0.5);
+    m_lower.setOpenLoopRampRate(0.5);
 
-    m_noteLimit.enableLimitSwitch(true);
-    SmartDashboard.putBoolean("Note IR Sensor", m_noteLimit.isLimitSwitchEnabled());
+    m_lower.follow(m_upper);
+
+    //m_noteLimit.enableLimitSwitch(true);
+    //SmartDashboard.putBoolean("Note IR Sensor", m_noteLimit.isLimitSwitchEnabled());
   }
 
   public void intake() {
@@ -40,7 +43,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void outtake() {
     m_upper.set(-IntakeConstants.kIntakePower);
-  }
+}
 
   public void stopIntake() {
     m_upper.set(0);
@@ -57,11 +60,12 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    m_noteLimit.enableLimitSwitch(SmartDashboard.getBoolean("Note IR Sensor", false));
+    
+    //m_noteLimit.enableLimitSwitch(SmartDashboard.getBoolean("Note IR Sensor", false));
     SmartDashboard.putNumber("Intake Power", IntakeConstants.kIntakePower);
 
-    if (m_noteLimit.isPressed()) {
-      stopIntake();
-    }
+    // if (m_noteLimit.isPressed()) {
+    //  stopIntake();
+    // }
   }
 }
