@@ -40,7 +40,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // private final SendableChooser<Command> autoChooser;
+  private final SendableChooser<Command> autoChooser;
   // The robot's subsystems and commands are defined here...
 
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
@@ -70,47 +70,15 @@ public class RobotContainer {
                     -MathUtil.applyDeadband(m_navigatorController.getRightX(), ControllerConstants.kDriveDeadband),
                     true, true),
                 m_robotDrive));
-    
-    // m_climb.setDefaultCommand(
-    //   new RunCommand(
-    //     () -> {
-    //       m_climb.stopClimb();
-    //     },
-    //     m_climb)
-    // );
 
-    // m_intake.setDefaultCommand(
-    //   new RunCommand(
-    //     () -> {
-    //       m_intake.stopIntake();
-    //     },
-    //     m_intake)
-    // );
+
     // Build an auto chooser. This will use Commands.none() as the default option.
-    // autoChooser = AutoBuilder.buildAutoChooser();
+    autoChooser = AutoBuilder.buildAutoChooser();
 
     // Another option that allows you to specify the default auto by its name
     // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
 
-    // SmartDashboard.putData("Auto Chooser", autoChooser);
-
-    
-    // m_shooter.setDefaultCommand(
-    //   new RunCommand(
-    //     () -> {
-    //       m_shooter.stopShooter();
-    //     },
-    //     m_shooter)
-    // );
-    // NamedCommands.registerCommand("Wait", m_robotDrive.wait(1));
-    // NamedCommands.registerCommand(null, getAutonomousCommand());
-    // NamedCommands.registerCommand(null, getAutonomousCommand());
-    // NamedCommands.registerCommand(null, getAutonomousCommand());
-    // NamedCommands.registerCommand(null, getAutonomousCommand());
-    // NamedCommands.registerCommand(null, getAutonomousCommand());
-    // NamedCommands.registerCommand(null, getAutonomousCommand());
-    // NamedCommands.registerCommand(null, getAutonomousCommand());
-    // NamedCommands.registerCommand(null, getAutonomousCommand());
+    SmartDashboard.putData("Auto Chooser", autoChooser);
     configureBindings();
   }
   
@@ -124,25 +92,7 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-
-//     Pose2d targetPose = new Pose2d(10, 5, Rotation2d.fromDegrees(180));
-
-// // Create the constraints to use while pathfinding
-// PathConstraints constraints = new PathConstraints(
-//         3.0, 4.0,
-//         Units.degreesToRadians(540), Units.degreesToRadians(720));
-
-// // Since AutoBuilder is configured, we can use it to build pathfinding commands
-// Command pathfindingCommand = AutoBuilder.pathfindToPose(
-//         targetPose,
-//         constraints,
-//         0.0, // Goal end velocity in meters/sec
-//         0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-// );
     // Configure your button bindings here
-    //+m_navigatorController.b().onTrue(new VisionAimTarget(m_vision, m_robotDrive));
-
-    // m_operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_intake.setIntake(IntakeConstants.kUpperIntakePower, IntakeConstants.kLowerIntakePower), m_intake));
     
     // Intake
     m_operatorController.rightBumper()
@@ -195,76 +145,77 @@ public class RobotContainer {
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *Sam is a weird monkey :) ()
+   *
    * @return the command to run in autonomous
    */
-  // public Command getAutonomousCommand() {
-  //   return autoChooser.getSelected();
-  // }
-
   public Command getAutonomousCommand() {
-    // SequentialCommandGroup MiddleShoot = new SequentialCommandGroup(
-    //     m_robotDrive.zeroHeading(),
-    //     new InstantCommand(
-    //       () -> m_shooter.shoot(),
-    //       m_shooter
-    //     ),
-    //     new InstantCommand(
-    //       () -> m_shooter.stopShooter(),
-    //       m_shooter
-    //     ),
-    //     new WaitCommand(10),
-    //     new InstantCommand(
-    //       () -> m_robotDrive.drive(0.2, 0, 0, false, false), 
-    //       m_robotDrive),
-    //     new WaitCommand(1.5),
-    //     new InstantCommand(
-    //       () -> m_robotDrive.drive(0, 0, 0, false, false),
-    //       m_robotDrive
-    //     )
-    // );
+    // return new PathPlannerAuto("Example Auto");
+    return autoChooser.getSelected();
+  }
 
-    SequentialCommandGroup driveForward = new SequentialCommandGroup(
-      new InstantCommand(
-        () -> m_robotDrive.drive(0, 0.75, 0, false, false),
-        m_robotDrive
-      ),
+  // public Command getAutonomousCommand() {
+  //   // SequentialCommandGroup MiddleShoot = new SequentialCommandGroup(
+  //   //     m_robotDrive.zeroHeading(),
+  //   //     new InstantCommand(
+  //   //       () -> m_shooter.shoot(),
+  //   //       m_shooter
+  //   //     ),
+  //   //     new InstantCommand(
+  //   //       () -> m_shooter.stopShooter(),
+  //   //       m_shooter
+  //   //     ),
+  //   //     new WaitCommand(10),
+  //   //     new InstantCommand(
+  //   //       () -> m_robotDrive.drive(0.2, 0, 0, false, false), 
+  //   //       m_robotDrive),
+  //   //     new WaitCommand(1.5),
+  //   //     new InstantCommand(
+  //   //       () -> m_robotDrive.drive(0, 0, 0, false, false),
+  //   //       m_robotDrive
+  //   //     )
+  //   // );
 
-      new WaitCommand(3),
+  //   SequentialCommandGroup driveForward = new SequentialCommandGroup(
+  //     new InstantCommand(
+  //       () -> m_robotDrive.drive(0, 0.75, 0, false, false),
+  //       m_robotDrive
+  //     ),
 
-      new InstantCommand(
-        () -> m_robotDrive.drive(0, 0, 0, false, false)
-      )
-    );
+  //     new WaitCommand(3),
 
-    SequentialCommandGroup shootSpeaker = new SequentialCommandGroup(
-      new InstantCommand(
-        () -> m_shooter.shoot(),
-        m_shooter
-      ),
+  //     new InstantCommand(
+  //       () -> m_robotDrive.drive(0, 0, 0, false, false)
+  //     )
+  //   );
 
-      new WaitCommand(2),
+  //   SequentialCommandGroup shootSpeaker = new SequentialCommandGroup(
+  //     new InstantCommand(
+  //       () -> m_shooter.shoot(),
+  //       m_shooter
+  //     ),
 
-      new InstantCommand(
-        () -> m_intake.intake(),
-        m_intake
-      ),
+  //     new WaitCommand(2),
 
-      new WaitCommand(1),
+  //     new InstantCommand(
+  //       () -> m_intake.intake(),
+  //       m_intake
+  //     ),
 
-      new InstantCommand(
-        () -> m_shooter.stopShooter(),
-        m_shooter
-      ),
+  //     new WaitCommand(1),
 
-      new InstantCommand(
-        () -> m_intake.stopIntake(),
-        m_intake
-      )
-    );
+  //     new InstantCommand(
+  //       () -> m_shooter.stopShooter(),
+  //       m_shooter
+  //     ),
+
+  //     new InstantCommand(
+  //       () -> m_intake.stopIntake(),
+  //       m_intake
+  //     )
+  //   );
     
-    // return shootSpeaker;
-    // return driveForward;
-    return null;
-    }
+  //   // return shootSpeaker;
+  //   // return driveForward;
+  //   return null;
+  //   }
 }
