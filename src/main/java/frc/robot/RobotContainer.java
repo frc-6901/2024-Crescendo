@@ -5,31 +5,18 @@
 package frc.robot;
 
 import frc.robot.Constants.ControllerConstants;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.util.Units;
 import com.pathplanner.lib.auto.NamedCommands;
-// import com.fasterxml.jackson.databind.PropertyNamingStrategies.KebabCaseStrategy;
-// import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -71,6 +58,10 @@ public class RobotContainer {
                     true, true),
                 m_robotDrive));
 
+    // Register PathPlanner Named Commands
+    NamedCommands.registerCommand("shoot", Commands.runOnce(() -> m_shooter.shoot(), m_shooter));
+    NamedCommands.registerCommand("stopShoot", Commands.runOnce(() -> m_shooter.stopShooter(), m_shooter));
+    NamedCommands.registerCommand("intake", Commands.runOnce(() -> m_intake.intake(), m_intake));
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     autoChooser = AutoBuilder.buildAutoChooser();
