@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 
@@ -114,6 +115,8 @@ public final class Constants {
     public static final int kRearLeftTurningCanId = 6;
     public static final int kRearRightDrivingCanId = 7;
     public static final int kRearRightTurningCanId = 8;
+    public static final double kPhysicalMaxSpeedMetersPerSecond = 5;
+    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
 
     // Pigeon Gyro
     public static final int kPigeonIMUId = 20;
@@ -170,7 +173,20 @@ public final class Constants {
     public static final int kDrivingMotorCurrentLimit = 50; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
-
+  public static final class AutoConstants {
+    public static final double kMaxSpeedMetersPerSecond = DriveConstants.kPhysicalMaxSpeedMetersPerSecond / 4;
+    public static final double kMaxAngularSpeedRadiansPerSecond = //
+            DriveConstants.kPhysicalMaxAngularSpeedRadiansPerSecond / 10;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 4;
+    public static final double kPXController = 1.5;
+    public static final double kPYController = 1.5;
+    public static final double kPThetaController = 3;
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = //
+            new TrapezoidProfile.Constraints(
+                    kMaxAngularSpeedRadiansPerSecond,
+                    kMaxAngularAccelerationRadiansPerSecondSquared);
+  }
   public static final class DrivetrainConstants {
     public static final int kLeftSRXDrivePort = 51;
     public static final int kLeftSPXDrivePort = 02;
@@ -207,7 +223,6 @@ public final class Constants {
 
     public static final double kAutoMaxSpeed = 1;
     public static final double kAutoMaxAccel = 1;
-
     public static final double kAutoTime = 2.5;
   }
 

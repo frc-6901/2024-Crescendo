@@ -4,11 +4,16 @@
 
 package frc.robot;
 
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+
+import java.util.List;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.util.Units;
@@ -20,8 +25,18 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
+import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -191,24 +207,49 @@ public class RobotContainer {
   //   return autoChooser.getSelected();
   // }
 
+  // public Command getAutonomousCommand() {
+  //       SequentialCommandGroup MiddleShoot = new SequentialCommandGroup(
+  //           m_robotDrive.zeroHeading(),
+  //           new InstantCommand(
+  //             () -> m_robotDrive.drive(0.2, 0, 0, false, false), 
+  //             m_robotDrive),
+  //           new WaitCommand(0.3),
+  //           new InstantCommand(
+  //             () -> m_robotDrive.drive(0, 0, 0, false, false),
+  //             m_robotDrive),
+  //           new InstantCommand(
+  //             () -> m_shooter.shoot(),
+  //             m_shooter),
+  //           new WaitCommand(0.2),
+  //           new InstantCommand(
+  //             () -> m_shooter.stopShooter(),
+  //             m_shooter)
+  //           );
+  //       return MiddleShoot;
+  //   }
   public Command getAutonomousCommand() {
-        SequentialCommandGroup MiddleShoot = new SequentialCommandGroup(
-            m_robotDrive.zeroHeading(),
-            new InstantCommand(
-              () -> m_robotDrive.drive(0.2, 0, 0, false, false), 
-              m_robotDrive),
-            new WaitCommand(0.3),
-            new InstantCommand(
-              () -> m_robotDrive.drive(0, 0, 0, false, false),
-              m_robotDrive),
-            new InstantCommand(
-              () -> m_shooter.shoot(),
-              m_shooter),
-            new WaitCommand(0.2),
-            new InstantCommand(
-              () -> m_shooter.stopShooter(),
-              m_shooter)
-            );
-        return MiddleShoot;
-    }
+    TrajectoryConfig config = new TrajectoryConfig(DrivetrainConstants.kAutoMaxSpeed, DrivetrainConstants.kAutoMaxAccel).setKinematics(DrivetrainConstants.kDriveKinematics);
+    Trajectory trajectory = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)), List.of(new Translation2d(1, 1), new Translation2d(2, -1)), new Pose2d(3, 0, new Rotation2d(0)), config); 
+    PIDController xController = new PIDController(AutoConstants.kPXController, 0, 0);
+    PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
+    ProfiledPIDController thetaController = new ProfiledPIDController(
+                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
+          trajectory,
+          m_robotDrive::getPose,
+          DriveConstants.kDriveKinematics,
+          xController,
+          yController,
+          thetaController,
+          m_robotDrive::setModuleStates,
+          m_robotDrive);
+
+  // 5. Add some init and wrap-up, and return everything
+  return new SequentialCommandGroup(
+          new InstantCommand(() -> m_robotDrive.resetPose(trajectory.getInitialPose())),
+          swerveControllerCommand,
+          new InstantCommand(() -> m_robotDrive.stopModules()));
+    //return Commands.runOnce(() -> m_robotDrive.resetPose(trajectory.getInitialPose())).andThen().andThen(Command.runOnce(() -> m_robotDrive.tankDriveVolts(0, 0)));
+  }
 }

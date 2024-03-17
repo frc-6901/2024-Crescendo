@@ -16,15 +16,26 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 // import frc.robot.Constants;
 import edu.wpi.first.wpilibj.DriverStation;
+// import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.sensors.PigeonIMU;
+// import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+// import edu.wpi.first.math.geometry.Pose2d;
+// import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+// import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+// import edu.wpi.first.util.sendable.SendableRegistry;
+// import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+// import edu.wpi.first.wpilibj.Encoder;
+// import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+// import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+// import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // import com.ctre.phoenix6.mechanisms.swerve.SimSwerveDrivetrain.SimSwerveModule;
 
 
@@ -50,6 +61,8 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
+
+  // private final DifferentialDrive m_drive = new DifferentialDrive(m_frontLeft::set, m_frontRight::set);
 
   // The gyro sensor
   private final PigeonIMU m_gyro = new PigeonIMU(DriveConstants.kPigeonIMUId);
@@ -111,6 +124,17 @@ public class DriveSubsystem extends SubsystemBase {
     }
     return states;
   }
+  public void stopModules() {
+    m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+}
+  // public void tankDriveVolts(double leftVolts, double rightVolts) {
+  //   m_frontLeft(leftVolts);
+  //   m_frontRight.setVoltage(rightVolts);
+  //   m_drive.feed();
+  // }
   public void setStates(SwerveModuleState[] targetStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, DriveConstants.kMaxSpeedMetersPerSecond);
 
@@ -180,6 +204,15 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
+  }
+  public double getHeading() {
+    double[] ypr = new double[3];
+    m_gyro.getYawPitchRoll(ypr);
+    double gyroAngle = Math.toRadians(ypr[0]);
+    return Math.IEEEremainder(gyroAngle, 360);
+  }
+  public Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(getHeading());
   }
 
   /**
@@ -349,12 +382,12 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
-  public double getHeading() {
-    double[] ypr = new double[3];
-    m_gyro.getYawPitchRoll(ypr);
-    double gyroAngle = Math.toRadians(ypr[0]);
-    return Rotation2d.fromDegrees(gyroAngle).getDegrees();
-  }
+  // public double getHeading() {
+  //   double[] ypr = new double[3];
+  //   m_gyro.getYawPitchRoll(ypr);
+  //   double gyroAngle = Math.toRadians(ypr[0]);
+  //   return Rotation2d.fromDegrees(gyroAngle).getDegrees();
+  // }
 
   /**
    * Returns the turn rate of the robot.
