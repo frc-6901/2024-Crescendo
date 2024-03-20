@@ -59,7 +59,16 @@ public final class Constants {
     public static double kShooterAmpPower = 0.175;
     public static double kShooterIntakePower = -0.175;
 
-    // public static double kShooterPIDp
+    public static double kShooterRPM = 1000;
+
+    public static double kShooterP = 0.05;
+    public static double kShooterI = 0.0;
+    public static double kShooterD = 0.01;
+    public static double kShooterFF = 0.00015;
+    public static double kShooterIz = 0;
+    public static final double kShooterMaxOutput = 1;
+    public static final double kShooterMinOutput = -1;
+
   }
 
   public static final class VisionConstans {

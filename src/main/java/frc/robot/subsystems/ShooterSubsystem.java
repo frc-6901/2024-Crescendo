@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -27,11 +28,29 @@ public class ShooterSubsystem extends SubsystemBase {
 
     m_rightMotor.setIdleMode(IdleMode.kCoast);
     m_leftMotor.setIdleMode(IdleMode.kCoast);
+
+    m_rightMotorPIDController.setP(ShooterConstants.kShooterP);
+    m_rightMotorPIDController.setI(ShooterConstants.kShooterI);
+    m_rightMotorPIDController.setD(ShooterConstants.kShooterD);
+    m_rightMotorPIDController.setIZone(ShooterConstants.kShooterIz);
+    m_rightMotorPIDController.setFF(ShooterConstants.kShooterFF);
+    m_rightMotorPIDController.setOutputRange(ShooterConstants.kShooterMinOutput, ShooterConstants.kShooterMaxOutput);
+
+    m_leftMotorPIDController.setP(ShooterConstants.kShooterP);
+    m_leftMotorPIDController.setI(ShooterConstants.kShooterI);
+    m_leftMotorPIDController.setD(ShooterConstants.kShooterD);
+    m_leftMotorPIDController.setIZone(ShooterConstants.kShooterIz);
+    m_leftMotorPIDController.setFF(ShooterConstants.kShooterFF);
+    m_leftMotorPIDController.setOutputRange(ShooterConstants.kShooterMinOutput, ShooterConstants.kShooterMaxOutput);
   }
 
   public void shoot() {
-    m_rightMotor.set(ShooterConstants.kShooterPower);
-  }
+    // m_rightMotor.set(ShooterConstants.kShooterPower);
+    // m_leftMotor.set(ShooterConstants.kShooterPower);
+
+    m_rightMotorPIDController.setReference(ShooterConstants.kShooterRPM, ControlType.kVelocity);
+    m_leftMotorPIDController.setReference(ShooterConstants.kShooterRPM, ControlType.kVelocity);
+    }
 
   public void shootAmp() {
     m_rightMotor.set(ShooterConstants.kShooterAmpPower);
@@ -57,5 +76,26 @@ public class ShooterSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Shooter Power", ShooterConstants.kShooterPower);
+
+    SmartDashboard.putNumber("Right Shooter RPM", m_rightMotor.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Left Shooter RPM", m_leftMotor.getEncoder().getVelocity());
+
+    SmartDashboard.putNumber("Shooter P", ShooterConstants.kShooterP);
+    SmartDashboard.putNumber("Shooter I", ShooterConstants.kShooterI);
+    SmartDashboard.putNumber("Shooter D", ShooterConstants.kShooterD);
+    SmartDashboard.putNumber("Shooter Iz", ShooterConstants.kShooterIz);
+    SmartDashboard.putNumber("Shooter FF", ShooterConstants.kShooterFF);
+
+    m_rightMotorPIDController.setP(SmartDashboard.getNumber("Shooter P", 0));
+    m_rightMotorPIDController.setI(SmartDashboard.getNumber("Shooter I", 0));
+    m_rightMotorPIDController.setD(SmartDashboard.getNumber("Shooter D", 0));
+    m_rightMotorPIDController.setIZone(SmartDashboard.getNumber("Shooter Iz", 0));
+    m_rightMotorPIDController.setFF(SmartDashboard.getNumber("Shooter FF", 0));
+
+    m_leftMotorPIDController.setP(SmartDashboard.getNumber("Shooter P", 0));
+    m_leftMotorPIDController.setI(SmartDashboard.getNumber("Shooter I", 0));
+    m_leftMotorPIDController.setD(SmartDashboard.getNumber("Shooter D", 0));
+    m_leftMotorPIDController.setIZone(SmartDashboard.getNumber("Shooter Iz", 0));
+    m_leftMotorPIDController.setFF(SmartDashboard.getNumber("Shooter FF", 0));
   }
 }
