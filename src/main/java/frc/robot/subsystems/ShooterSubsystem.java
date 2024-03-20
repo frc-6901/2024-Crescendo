@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -16,35 +17,32 @@ public class ShooterSubsystem extends SubsystemBase {
   private CANSparkMax m_rightMotor = new CANSparkMax(ShooterConstants.kRightShooterCanID, MotorType.kBrushless);
   private CANSparkMax m_leftMotor = new CANSparkMax(ShooterConstants.kLeftShooterCanID, MotorType.kBrushless);
 
+  private SparkPIDController m_rightMotorPIDController = m_rightMotor.getPIDController();
+  private SparkPIDController m_leftMotorPIDController = m_leftMotor.getPIDController();
+
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
     m_rightMotor.restoreFactoryDefaults();
     m_leftMotor.restoreFactoryDefaults();
 
-    m_rightMotor.setIdleMode(IdleMode.kBrake);
-    m_leftMotor.setIdleMode(IdleMode.kBrake);
-
-    m_rightMotor.setOpenLoopRampRate(1);
-    m_leftMotor.setOpenLoopRampRate(1);
-
-    // Follow the right motor inversly
-    m_rightMotor.follow(m_leftMotor, true);
+    m_rightMotor.setIdleMode(IdleMode.kCoast);
+    m_leftMotor.setIdleMode(IdleMode.kCoast);
   }
 
   public void shoot() {
-    m_leftMotor.set(ShooterConstants.kShooterPower);
+    m_rightMotor.set(ShooterConstants.kShooterPower);
   }
 
   public void shootAmp() {
-    m_leftMotor.set(ShooterConstants.kShooterAmpPower);
+    m_rightMotor.set(ShooterConstants.kShooterAmpPower);
   }
 
   public void shooterIntake() {
-    m_leftMotor.set(ShooterConstants.kShooterIntakePower);
+    m_rightMotor.set(ShooterConstants.kShooterIntakePower);
   }
 
   public void stopShooter() {
-    m_leftMotor.set(0);
+    m_rightMotor.set(0);
   }
 
   public void increaseShooterPower() {

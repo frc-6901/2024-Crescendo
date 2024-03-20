@@ -25,11 +25,11 @@ public class IntakeSubsystem extends SubsystemBase {
     m_upper.restoreFactoryDefaults();
     m_lower.restoreFactoryDefaults();
 
-    m_upper.setIdleMode(IdleMode.kBrake);
-    m_lower.setIdleMode(IdleMode.kBrake);
+    m_upper.setIdleMode(IdleMode.kCoast);
+    m_lower.setIdleMode(IdleMode.kCoast);
 
-    m_upper.setOpenLoopRampRate(0.5);
-    m_lower.setOpenLoopRampRate(0.5);
+    m_upper.setOpenLoopRampRate(0.25);
+    m_lower.setOpenLoopRampRate(0.25);
 
     m_lower.follow(m_upper);
 

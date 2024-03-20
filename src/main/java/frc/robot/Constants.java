@@ -52,12 +52,14 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final int kRightShooterCanID = 21;
-    public static final int kLeftShooterCanID = 20;
-
+    public static final int kRightShooterCanID = 20;
+    public static final int kLeftShooterCanID = 21;
+    
     public static double kShooterPower = 0.85;
-    public static double kShooterAmpPower = 0.2;
-    public static double kShooterIntakePower = -0.15;
+    public static double kShooterAmpPower = 0.175;
+    public static double kShooterIntakePower = -0.175;
+
+    // public static double kShooterPIDp
   }
 
   public static final class VisionConstans {
