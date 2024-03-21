@@ -53,12 +53,25 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final int kRightShooterCanID = 21;
-    public static final int kLeftShooterCanID = 20;
-
+    public static final int kRightShooterCanID = 20;
+    public static final int kLeftShooterCanID = 21;
+    
     public static double kShooterPower = 0.85;
-    public static double kShooterAmpPower = 0.2;
-    public static double kShooterIntakePower = -0.15;
+    public static double kShooterAmpPower = 0.175;
+    public static double kShooterIntakePower = -0.175;
+
+    // public static double kShooterRPM = 4500;
+    // public static double kShooterAmpRPM = 800;
+    // public static double kShooterIntakeRPM = 1000;
+
+    // public static double kShooterP = 0.025;
+    // public static double kShooterI = 0.0;
+    // public static double kShooterD = 0.005;
+    // public static double kShooterFF = 0;
+    // public static double kShooterIz = 0;
+    // public static final double kShooterMaxOutput = 1;
+    // public static final double kShooterMinOutput = -1;
+
   }
 
   public static final class VisionConstans {
@@ -123,7 +136,7 @@ public final class Constants {
 
     // Pigeon Gyro
     public static final int kPigeonIMUId = 20;
-    public static final boolean kGyroReversed = false;
+    public static final boolean kGyroReversed = true;
   }
 
   public static final class ModuleConstants {

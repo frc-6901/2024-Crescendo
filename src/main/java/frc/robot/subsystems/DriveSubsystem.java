@@ -180,8 +180,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Put the gyro angles on the SmartDashboard
     SmartDashboard.putNumber("Gyro Yaw", ypr[0]);
-    SmartDashboard.putNumber("Gyro Pitch", ypr[1]);
-    SmartDashboard.putNumber("Gyro Roll", ypr[2]);
     SmartDashboard.putNumber("Gyro Turn Rate", getTurnRate());
   }
 
