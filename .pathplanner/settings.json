@@ -1,8 +1,9 @@
 {
-  "robotWidth": 0.75,
-  "robotLength": 0.75,
+  "robotWidth": 0.89,
+  "robotLength": 0.89,
   "holonomicMode": true,
   "pathFolders": [
+    "SAM",
     "LeftAmp",
     "LeftNode",
     "MiddleFar",
@@ -11,10 +12,12 @@
     "Right2Nodes",
     "RightNode"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "SAM"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
-  "maxModuleSpeed": 5.0
+  "maxModuleSpeed": 4.8
 }

@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,7 +13,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-// import frc.robot.Constants;
 import edu.wpi.first.wpilibj.DriverStation;
 // import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,25 +21,15 @@ import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.sensors.PigeonIMU;
-// import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-// import edu.wpi.first.math.geometry.Pose2d;
-// import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-// import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-// import edu.wpi.first.util.sendable.SendableRegistry;
-// import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-// import edu.wpi.first.wpilibj.Encoder;
-// import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-// import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-// import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // import com.ctre.phoenix6.mechanisms.swerve.SimSwerveDrivetrain.SimSwerveModule;
 
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
-  private SimSwerveModule[] modules;
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
@@ -89,6 +77,7 @@ public class DriveSubsystem extends SubsystemBase {
       
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    // Configure AutoBuilder
     AutoBuilder.configureHolonomic(
             this::getPose, // Robot pose supplier
             this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
@@ -97,8 +86,8 @@ public class DriveSubsystem extends SubsystemBase {
             new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                     new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
                     new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
-                    4.5, // Max module speed, in m/s
-                    0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+                    DriveConstants.kMaxSpeedMetersPerSecond, // Max module speed, in m/s
+                    DriveConstants.kDriveBaseRadius, // Drive base radius in meters. Distance from robot center to furthest module.
                     new ReplanningConfig() // Default path replanning config. See the API for the options here
             ),
             () -> {
@@ -114,44 +103,43 @@ public class DriveSubsystem extends SubsystemBase {
             },
             this // Reference to this subsystem to set requirements
     );
-
   }
 
-  public SwerveModuleState[] getModuleStates() {
-    SwerveModuleState[] states = new SwerveModuleState[modules.length];
-    for (int i = 0; i < modules.length; i++) {
-      states[i] = modules[i].getState();
-    }
-    return states;
-  }
-  public void stopModules() {
-    m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
-    m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
-    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
-    m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
-}
-  // public void tankDriveVolts(double leftVolts, double rightVolts) {
-  //   m_frontLeft(leftVolts);
-  //   m_frontRight.setVoltage(rightVolts);
-  //   m_drive.feed();
+  // public SwerveModuleState[] getModuleStates() {
+  //   SwerveModuleState[] states = new SwerveModuleState[modules.length];
+  //   for (int i = 0; i < modules.length; i++) {
+  //     states[i] = modules[i].getState();
+  //   }
+  //   return states;
   // }
-  public void setStates(SwerveModuleState[] targetStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, DriveConstants.kMaxSpeedMetersPerSecond);
+  // public void setStates(SwerveModuleState[] targetStates) {
+  //   SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, DriveConstants.kMaxSpeedMetersPerSecond);
 
-    for (int i = 0; i < modules.length; i++) {
-      modules[i].setTargetState(targetStates[i]);
-    }
-  }
+  //   for (int i = 0; i < modules.length; i++) {
+  //     modules[i].setTargetState(targetStates[i]);
+  //   }
+  // }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
   }
 
-  public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
-    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
+  // public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
+  //   ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
 
-    SwerveModuleState[] targetStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(targetSpeeds);
-    setStates(targetStates);
+  //   SwerveModuleState[] targetStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(targetSpeeds);
+  //   setStates(targetStates);
+  // }
+  public void driveRobotRelative(ChassisSpeeds speeds) {
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
+    // SwerveDriveKinematics.desaturateWheelSpeeds(
+    //     swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    
+    // m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    // m_frontRight.setDesiredState(swerveModuleStates[1]);
+    // m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    // m_rearRight.setDesiredState(swerveModuleStates[3]);
+    setModuleStates(swerveModuleStates);
   }
 
   class SimSwerveModule {
@@ -217,9 +205,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /**
    * Resets the odometry to the specified pose.
-   *e
-   
-   
+   *   
    * @param pose The pose to which to set the odometry.
    */
   public void resetPose(Pose2d pose) {
@@ -236,6 +222,10 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         },
         pose);
+  }
+
+  public ChassisSpeeds getSpeeds() {
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
   }
 
   /**
@@ -338,6 +328,12 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Method to drive the robot using ChassisSpeeds relative to robot.
+   * 
+   * @param speeds      The speeds to drive the robot at.
+   */
+
+  /**
    * Sets the wheels into an X formation to prevent movement.
    */
   public void setX() {
@@ -345,6 +341,15 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+  }
+
+  public SwerveModuleState[] getModuleStates(){
+      return new SwerveModuleState[]{
+          m_frontLeft.getState(),
+          m_frontRight.getState(),
+          m_rearLeft.getState(),
+          m_rearRight.getState()
+      };
   }
 
   /**
@@ -375,6 +380,9 @@ public class DriveSubsystem extends SubsystemBase {
       () -> {
         m_gyro.setYaw(0);
       });
+  }
+  public void stopModules() {
+    setX();
   }
 
   /**

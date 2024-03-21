@@ -35,12 +35,13 @@ public final class Constants {
   public static final class ControllerConstants {
     public static final int kNavigatorPort = 0;
     public static final int kOperatorPort = 1;
-    public static final double kDriveDeadband = 0.05;
+    public static final double kDriveDeadband = 0.1;
   }
 
   public static final class ClimberConstants {
     public static final int kRightClimberCanID = 11;
     public static final int kLeftClimberCanID = 12;
+    
     public static double kClimberPower = 0.75;
   }
 
@@ -90,10 +91,12 @@ public final class Constants {
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(26);
+    public static final double kTrackWidth = Units.inchesToMeters(25);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(26);
+    public static final double kWheelBase = Units.inchesToMeters(25);
     // Distance between front and back wheels on robot
+    public static final double kDriveBaseRadius = Math.sqrt(kWheelBase * kWheelBase + kTrackWidth * kTrackWidth) / 2;
+    // Distance between center of robot to center of wheelbase
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
         new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
