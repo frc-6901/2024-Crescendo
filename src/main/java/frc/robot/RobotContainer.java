@@ -132,6 +132,13 @@ public class RobotContainer {
 
     m_operatorController.povRight().onTrue(Commands.runOnce(() -> m_intake.increaseIntakePower(), m_intake));
     m_operatorController.povLeft().onTrue(Commands.runOnce(() -> m_intake.decreaseIntakePower(), m_intake));
+    
+    // m_operatorController.povUp().onTrue(Commands.runOnce(() -> m_shooter.increaseShooterP(), m_shooter));
+    // m_operatorController.povDown().onTrue(Commands.runOnce(() -> m_shooter.decreaseShooterP(), m_shooter));
+    
+    // m_operatorController.povRight().onTrue(Commands.runOnce(() -> m_shooter.increaseShooterD(), m_shooter));
+    // m_operatorController.povLeft().onTrue(Commands.runOnce(() -> m_shooter.increaseShooterD(), m_shooter));
+    
   }
 
   /**
