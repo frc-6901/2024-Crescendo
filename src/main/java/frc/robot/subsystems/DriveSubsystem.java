@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
+// import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
@@ -24,6 +25,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+// import com.ctre.phoenix6.mechanisms.swerve.SimSwerveDrivetrain.SimSwerveModule;
 
 
 public class DriveSubsystem extends SubsystemBase {
@@ -47,6 +49,8 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
+
+  // private final DifferentialDrive m_drive = new DifferentialDrive(m_frontLeft::set, m_frontRight::set);
 
   // The gyro sensor
   private final PigeonIMU m_gyro = new PigeonIMU(DriveConstants.kPigeonIMUId);
@@ -101,6 +105,59 @@ public class DriveSubsystem extends SubsystemBase {
     );
   }
 
+  // public SwerveModuleState[] getModuleStates() {
+  //   SwerveModuleState[] states = new SwerveModuleState[modules.length];
+  //   for (int i = 0; i < modules.length; i++) {
+  //     states[i] = modules[i].getState();
+  //   }
+  //   return states;
+  // }
+  // public void setStates(SwerveModuleState[] targetStates) {
+  //   SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, DriveConstants.kMaxSpeedMetersPerSecond);
+
+  //   for (int i = 0; i < modules.length; i++) {
+  //     modules[i].setTargetState(targetStates[i]);
+  //   }
+  // }
+
+  // public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
+  //   ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
+
+  //   SwerveModuleState[] targetStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(targetSpeeds);
+  //   setStates(targetStates);
+  // }
+  public void driveRobotRelative(ChassisSpeeds speeds) {
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
+    // SwerveDriveKinematics.desaturateWheelSpeeds(
+    //     swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    
+    // m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    // m_frontRight.setDesiredState(swerveModuleStates[1]);
+    // m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    // m_rearRight.setDesiredState(swerveModuleStates[3]);
+    setModuleStates(swerveModuleStates);
+  }
+
+  class SimSwerveModule {
+    private SwerveModulePosition currentPosition = new SwerveModulePosition();
+    private SwerveModuleState currentState = new SwerveModuleState();
+
+    public SwerveModulePosition getPosition() {
+      return currentPosition;
+    }
+    
+  public SwerveModuleState getState() {
+    return currentState;
+  }
+  public void setTargetState(SwerveModuleState targetState) {
+    // Optimize the state
+    currentState = SwerveModuleState.optimize(targetState, currentState.angle);
+
+    currentPosition = new SwerveModulePosition(currentPosition.distanceMeters + (currentState.speedMetersPerSecond * 0.02), currentState.angle);
+  }
+  }
+
+
   @Override
   public void periodic() {
     double[] ypr = new double[3];
@@ -129,6 +186,15 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
+  }
+  public double getHeading() {
+    double[] ypr = new double[3];
+    m_gyro.getYawPitchRoll(ypr);
+    double gyroAngle = Math.toRadians(ypr[0]);
+    return Math.IEEEremainder(gyroAngle, 360);
+  }
+  public Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(getHeading());
   }
 
   /**
@@ -260,16 +326,6 @@ public class DriveSubsystem extends SubsystemBase {
    * 
    * @param speeds      The speeds to drive the robot at.
    */
-  public void driveRobotRelative(ChassisSpeeds speeds) {
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
-  }
 
   /**
    * Sets the wheels into an X formation to prevent movement.
@@ -281,6 +337,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
   }
 
+  
   /** */
   public void stopAll() {
     m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
@@ -288,6 +345,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
   }
+
 
   public ChassisSpeeds getRobotRelativeSpeeds(){
     return DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
@@ -331,18 +389,21 @@ public class DriveSubsystem extends SubsystemBase {
         m_gyro.setYaw(0);
       });
   }
+  public void stopModules() {
+    setX();
+  }
 
   /**
    * Returns the heading of the robot.
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
-  public double getHeading() {
-    double[] ypr = new double[3];
-    m_gyro.getYawPitchRoll(ypr);
-    double gyroAngle = Math.toRadians(ypr[0]);
-    return Rotation2d.fromDegrees(gyroAngle).getDegrees();
-  }
+  // public double getHeading() {
+  //   double[] ypr = new double[3];
+  //   m_gyro.getYawPitchRoll(ypr);
+  //   double gyroAngle = Math.toRadians(ypr[0]);
+  //   return Rotation2d.fromDegrees(gyroAngle).getDegrees();
+  // }
 
   /**
    * Returns the turn rate of the robot.
