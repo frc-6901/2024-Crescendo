@@ -29,8 +29,8 @@ public class ShooterSubsystem extends SubsystemBase {
     m_rightMotor.setIdleMode(IdleMode.kCoast);
     m_leftMotor.setIdleMode(IdleMode.kCoast);
 
-    m_rightMotor.setClosedLoopRampRate(0.25);
-    m_leftMotor.setClosedLoopRampRate(0.25);
+    m_rightMotor.setClosedLoopRampRate(0.3);
+    m_leftMotor.setClosedLoopRampRate(0.3);
 
     m_leftMotor.setInverted(true);
 

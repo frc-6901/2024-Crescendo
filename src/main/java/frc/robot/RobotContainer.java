@@ -5,10 +5,12 @@
 package frc.robot;
 
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
+import com.ctre.phoenix.schedulers.SequentialScheduler;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
@@ -16,7 +18,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -40,7 +45,7 @@ public class RobotContainer {
 
   //private final VisionSubsystem m_vision = new VisionSubsystem();
 
-  //private final ClimberSubsystem m_climb = new ClimberSubsystem();
+  private final ClimberSubsystem m_climb = new ClimberSubsystem();
 
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
@@ -111,14 +116,14 @@ public class RobotContainer {
       .onFalse(Commands.runOnce(() -> m_intake.stopIntake(), m_intake));
     
     // // Climb
-    // m_operatorController.x()
-    //   .onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb))
-    //   .onFalse(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
+    m_operatorController.x()
+      .onTrue(Commands.runOnce(() -> m_climb.climb(), m_climb))
+      .onFalse(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
 
-    // // Reverse Climb
-    // m_operatorController.a()
-    //   .onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb))
-    //   .onFalse(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
+    // Reverse Climb
+    m_operatorController.a()
+      .onTrue(Commands.runOnce(() -> m_climb.reverseClimb(), m_climb))
+      .onFalse(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
 
     // // Stop Climber
     // m_operatorController.b().onTrue(Commands.runOnce(() -> m_climb.stopClimb(), m_climb));
@@ -146,37 +151,153 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    // return new PathPlannerAuto("Example Auto");
-    return autoChooser.getSelected();
-  }
-
   // public Command getAutonomousCommand() {
-  //   // SequentialCommandGroup MiddleShoot = new SequentialCommandGroup(
-  //   //     m_robotDrive.zeroHeading(),
-  //   //     new InstantCommand(
-  //   //       () -> m_shooter.shoot(),
-  //   //       m_shooter
-  //   //     ),
-  //   //     new InstantCommand(
-  //   //       () -> m_shooter.stopShooter(),
-  //   //       m_shooter
-  //   //     ),
-  //   //     new WaitCommand(10),
-  //   //     new InstantCommand(
-  //   //       () -> m_robotDrive.drive(0.2, 0, 0, false, false), 
-  //   //       m_robotDrive),
-  //   //     new WaitCommand(1.5),
-  //   //     new InstantCommand(
-  //   //       () -> m_robotDrive.drive(0, 0, 0, false, false),
-  //   //       m_robotDrive
-  //   //     )
-  //   // );
+    // return new PathPlannerAuto("Example Auto");
+    // return autoChooser.getSelected();
+  // }
+
+  public Command getAutonomousCommand() {
+    SequentialCommandGroup ShootAndDrive = new SequentialCommandGroup(
+        new InstantCommand(
+          () -> m_shooter.shoot(),
+          m_shooter
+        ),
+
+        new WaitCommand(.75),
+
+        new InstantCommand(
+          () -> m_intake.intake(),
+          m_intake
+        ),
+
+        new WaitCommand(2),
+
+        new InstantCommand(
+          () -> m_intake.stopIntake(),
+          m_intake
+        ),
+
+        new InstantCommand(
+          () -> m_shooter.stopShooter(),
+          m_shooter
+        ),
+
+        new InstantCommand(
+          () -> m_robotDrive.drive(.5, 0, 0, true, true),
+          m_robotDrive
+        ),
+
+        new WaitCommand(2),
+
+        new InstantCommand(
+          () -> m_robotDrive.stopAll(),
+          m_robotDrive
+        )
+    );
+
+    SequentialCommandGroup shootOnly = new SequentialCommandGroup(
+      new InstantCommand(
+        () -> m_shooter.shoot(),
+        m_shooter
+      ),
+
+      new WaitCommand(1.6901),
+
+      new InstantCommand(
+        () -> m_shooter.stopShooter(),
+        m_shooter
+      )
+    );
+
+    SequentialCommandGroup drive = new SequentialCommandGroup(
+      new InstantCommand(
+        () -> m_robotDrive.drive(0.5, 0, 0, true, true),
+        m_robotDrive
+      ),
+
+      new WaitCommand(2),
+
+      new InstantCommand(
+        () -> m_robotDrive.stopAll(),
+        m_robotDrive
+      )
+    );
+
+    SequentialCommandGroup TwoNote = new SequentialCommandGroup(
+      new InstantCommand(
+          () -> m_shooter.shoot(),
+          m_shooter
+        ),
+
+        new WaitCommand(1),
+
+        new InstantCommand(
+          () -> m_shooter.stopShooter(),
+          m_shooter
+        ),
+
+        new InstantCommand(
+          () -> m_robotDrive.drive(0.25, 0, 0, true, false),
+          m_robotDrive
+        ),
+
+        new InstantCommand(
+          () -> m_intake.intake(),
+          m_intake
+        ),
+
+        new WaitCommand(1.5),
+
+        new InstantCommand(
+          () -> m_robotDrive.drive(0, 0, 0, true, false),
+          m_robotDrive
+        ),
+
+        new InstantCommand(
+          () -> m_intake.stopIntake(),
+          m_intake
+        ),
+
+        new WaitCommand(0.5),
+
+        new InstantCommand(
+          () -> m_robotDrive.drive(-0.25, 0, 0, true, false),
+          m_robotDrive
+        ),
+
+        new WaitCommand(1.75),
+
+        new InstantCommand(
+          () -> m_robotDrive.drive(0, 0, 0, true, false),
+          m_robotDrive
+        ),
+
+        new InstantCommand(
+          () -> m_shooter.shoot(),
+          m_shooter
+        ),
+
+        new WaitCommand(1),
+
+        new InstantCommand(
+          () -> m_shooter.stopShooter(),
+          m_shooter
+        )
+    );
+
+    return TwoNote;
+
+    // return ShootAndDrive;
+
+    // return drive;
+
+    // return shootOnly;
+  }
 
   //   SequentialCommandGroup driveForward = new SequentialCommandGroup(
   //     new InstantCommand(
   //       () -> m_robotDrive.drive(0, 0.75, 0, false, false),
-  //       m_robotDrive
+  //       m_robotDrive                                          n  rbnn bb                                                            
   //     ),
 
   //     new WaitCommand(3),

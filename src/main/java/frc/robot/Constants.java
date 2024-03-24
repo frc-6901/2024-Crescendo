@@ -48,7 +48,7 @@ public final class Constants {
     public static final int kUpperIntakeCanID = 15;
     public static final int kLowerIntakeCanID = 16;
 
-    public static double kIntakePower = 0.85;
+    public static double kIntakePower = 0.7;
   }
 
   public static final class ShooterConstants {
@@ -56,7 +56,7 @@ public final class Constants {
     public static final int kLeftShooterCanID = 21;
     
     public static double kShooterPower = 0.85;
-    public static double kShooterAmpPower = 0.175;
+    public static double kShooterAmpPower = 0.155;
     public static double kShooterIntakePower = -0.175;
 
     // public static double kShooterRPM = 4500;
@@ -95,7 +95,8 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
+    public static final double kMaxSpeedMetersPerSecond = 5
+    ;
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.2; // radians per second

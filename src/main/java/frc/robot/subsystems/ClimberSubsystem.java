@@ -18,8 +18,8 @@ public class ClimberSubsystem extends SubsystemBase {
   private CANSparkMax m_RightClimber = new CANSparkMax(ClimberConstants.kRightClimberCanID, MotorType.kBrushless);
   private CANSparkMax m_LeftClimber = new CANSparkMax(ClimberConstants.kLeftClimberCanID, MotorType.kBrushless);
   
-  private SparkLimitSwitch m_RightReverseLimit = m_RightClimber.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
-  private SparkLimitSwitch m_LeftReverseLimit = m_LeftClimber.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
+  // private SparkLimitSwitch m_RightReverseLimit = m_RightClimber.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
+  // private SparkLimitSwitch m_LeftReverseLimit = m_LeftClimber.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
 
   /** Creates a new ClimberSubsystem. */
   public ClimberSubsystem() {
@@ -31,11 +31,11 @@ public class ClimberSubsystem extends SubsystemBase {
 
     // m_LeftClimber.follow(m_RightClimber);
 
-    m_RightReverseLimit.enableLimitSwitch(true);
-    m_LeftReverseLimit.enableLimitSwitch(true);
+    // m_RightReverseLimit.enableLimitSwitch(true);
+    // m_LeftReverseLimit.enableLimitSwitch(true);
 
-    SmartDashboard.putBoolean("Right Limit Switch", m_RightReverseLimit.isLimitSwitchEnabled());
-    SmartDashboard.putBoolean("Left Limit Switch", m_LeftReverseLimit.isLimitSwitchEnabled());
+    // SmartDashboard.putBoolean("Right Limit Switch", m_RightReverseLimit.isLimitSwitchEnabled());
+    // SmartDashboard.putBoolean("Left Limit Switch", m_LeftReverseLimit.isLimitSwitchEnabled());
   }
 
   public void climb() {
@@ -56,19 +56,19 @@ public class ClimberSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    m_RightReverseLimit.enableLimitSwitch(SmartDashboard.getBoolean("Right Limit Switch", false));
-    m_LeftReverseLimit.enableLimitSwitch(SmartDashboard.getBoolean("Left Limit Switch", false));
+    // m_RightReverseLimit.enableLimitSwitch(SmartDashboard.getBoolean("Right Limit Switch", false));
+    // m_LeftReverseLimit.enableLimitSwitch(SmartDashboard.getBoolean("Left Limit Switch", false));
 
-    SmartDashboard.putBoolean("Right Limit Switch", m_RightReverseLimit.isPressed());
-    SmartDashboard.putBoolean("Left Limit Switch", m_LeftReverseLimit.isPressed());
+    // SmartDashboard.putBoolean("Right Limit Switch", m_RightReverseLimit.isPressed());
+    // SmartDashboard.putBoolean("Left Limit Switch", m_LeftReverseLimit.isPressed());
 
-    if (m_RightReverseLimit.isPressed()) {
-      m_RightClimber.set(0);
-    }
+    // if (m_RightReverseLimit.isPressed()) {
+    //   m_RightClimber.set(0);
+    // }
 
-    if (m_LeftReverseLimit.isPressed()) {
-      m_LeftClimber.set(0);
-    }
+    // if (m_LeftReverseLimit.isPressed()) {
+    //   m_LeftClimber.set(0);
+    // }
 
     
   }
